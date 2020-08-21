@@ -1,0 +1,64 @@
+﻿Game Initial
+Music Change path=(dBu music - 不思議な不思議なお祓い棒) crossfade=2000
+Character Add Which=left path=UIElements/hhbj/Alice/Sad name=爱丽丝
+Game Pause
+Text Add context=………………
+Game Pause
+Character Add which=right path=UIElements/hhbj/Marisa/HappyTalk name=魔理沙
+Text Change context=爱丽丝，我们到了！
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/Normal name=爱丽丝
+Text Change context=太好了，请你们帮我抓住人偶们。
+Game Pause
+Character Change which=right path=UIElements/hhbj/Reimu/Normal name=灵梦
+Text Change context=你不能控制他们了吗？
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/Sad name=爱丽丝
+Text Change context=我已经做不到了，突然间它们仿佛拥有了自我意识……
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/SmileCloseEye name=爱丽丝
+Text Add context=不过现在可以封印它们。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/Normal name=爱丽丝
+Character Change which=right path=UIElements/hhbj/Reimu/Think name=灵梦
+Text Change context=封印？要怎么做？
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/SmileCloseEye name=爱丽丝
+Text Change context=只要按下WASD，当你们碰到人偶时，就自动完成封印了。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/Normal name=爱丽丝
+Character Change which=right path=UIElements/hhbj/Marisa/HappyTalk name=魔理沙
+Text Change context=简单简单~
+Game Pause
+Character Change which=right path=UIElements/hhbj/Reimu/NormalCloseEye name=灵梦
+Text Change context=什么吗，这种小事你们自己也能做吧？
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/SmileCloseEye name=爱丽丝
+Text Change context=抱歉，能不能帮我个忙呢~
+Game Pause
+Character Change which=right path=UIElements/hhbj/Reimu/Happy name=灵梦
+Text Change Context=嘛，既然来了就稍微活动活动筋骨吧~
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/Normal name=爱丽丝
+Text Change Context=谢谢~不过要注意的是，过段时间，人偶会自动爆炸，冲击波还会让其他人偶更容易爆炸，还请你们尽快地封印更多的人偶。
+Game Pause
+Text Change context=(被封印的人偶会排成队跟着你，你可以通过‘Q’交换队列顺序)
+Game Pause
+Text Add context=(，和‘R’解除人偶封印，来舍弃要爆炸的人偶，避免冲击波对其他人偶的影响。)
+Game Pause
+Character Change which=right path=UIElements/hhbj/Marisa/Laugh name=魔理沙
+Text Change context=抓人偶小菜一碟da☆ze~
+Game Pause
+Text Add context=( 不如玩个游戏吧~ 看看谁是捕偶小能手~)
+Game Pause
+Text Change context=(最后分数等于 已封印人偶数 * 100 + 现持有人偶数 * 200 如何？)
+Game Pause
+Character Change which=left path=UIElements/hhbj/Reimu/Happy name=灵梦
+Text Change context=嘛，我倒是无所谓。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Alice/ReadyFight name=爱丽丝
+Character Remove which=right
+Text Change context=小心！人偶们出来了！
+Game Pause
+Game Event eventname=GameStart
+Game Stop

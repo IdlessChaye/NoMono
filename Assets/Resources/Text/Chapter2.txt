@@ -1,0 +1,52 @@
+﻿Game Initial
+Character Add which=left path=UIElements/hhbj/Marisa/Laugh name=魔理沙
+Game Pause
+Text Add context=最后一个人偶，封印！
+Game Pause
+Character Add which=right path=UIElements/hhbj/Alice/Normal name=爱丽丝
+Text Change context=谢谢你们，辛苦了~
+Game Pause
+Character Change which=left path=UIElements/hhbj/Reimu/Think name=灵梦
+Text Change context=这样就好了吗？她们不会再乱跑了嘛？
+Game Pause
+Character Change which=right path=UIElements/hhbj/Alice/NormalCloseEye name=爱丽丝
+Text Change context=恩恩，现在人偶里的灵气已经散开了。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Reimu/NormalCloseEye name=灵梦
+Text Change context=人偶会具有自我意识，从来没听说过呢。
+Game Pause
+Character Change which=right path=UIElements/hhbj/Alice/Sad name=爱丽丝
+Text Change context=平时偶尔一两个会有点反常，但是这次她们都这么精神，实在是很奇怪啊。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Reimu/Think name=灵梦
+Text Change context=看来是有人捣鬼呢，要调查一下了。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Marisa/Smile name=魔理沙
+Text Change context=(又解决一次异变了ze~ 现在心情就像新年换上崭新的扫把一样清爽呢~)
+Game Pause
+Character Change which=right path=UIElements/hhbj/Alice/Normal name=爱丽丝
+Text Change context=多亏了有你们~作为谢礼，送给你们人偶好吗？
+Game Pause
+Character Change which=left path=UIElements/hhbj/Reimu/Surprise name=灵梦
+Text Change context=诶，会爆炸的吧？
+Game Pause
+Character Change which=right path=UIElements/hhbj/Alice/Sad name=爱丽丝
+Text Change context=不是那种战斗用人偶啦，是送礼用的精致人偶。
+Game Pause
+Character Change which=left path=UIElements/hhbj/Marisa/HappyTalk name=魔理沙
+Text Change context=我更想要能爆炸的人偶啊~
+Game Pause
+Character Change which=right path=UIElements/hhbj/Alice/NormalCloseEye name=爱丽丝
+Text Change context=万一炸掉了多可惜啊，魔理沙要好好珍惜啊！
+Game Pause
+Character Change which=left path=UIElements/hhbj/Marisa/Smile name=魔理沙
+Text Change context=诶，那你送我两个人偶，一个能爆炸，一个不能，好吗？
+Game Pause
+Character Change which=right path=UIElements/hhbj/Alice/Sad name=爱丽丝
+Text Change context=就送一个人偶！
+Game Pause
+Character Change which=left path=UIElements/hhbj/Marisa/Han name=魔理沙
+Text Change context=小气~
+Game Pause
+Game Event eventname=MainSceneOver
+Game Stop
