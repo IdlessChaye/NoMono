@@ -401,6 +401,7 @@ GameObject:
   - component: {fileID: 806351853}
   - component: {fileID: 806351855}
   - component: {fileID: 806351854}
+  - component: {fileID: 806351856}
   m_Layer: 5
   m_Name: zhuyi
   m_TagString: Untagged
@@ -465,6 +466,19 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 806351852}
+--- !u!114 &806351856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 806351852}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c181379ea73b11f49b48455ed74c2c32, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  text: {fileID: 806351854}
+  key: 1
 --- !u!1 &955117236
 GameObject:
   m_ObjectHideFlags: 0

@@ -20,5 +20,11 @@ namespace NingyoRi
 		public const string ERightClick = "ERightClick";
 
 		#endregion
+
+		#region UI Path
+
+		public static string uiCanvasPath = @"UI/UICanvas";
+
+		#endregion
 	}
 }

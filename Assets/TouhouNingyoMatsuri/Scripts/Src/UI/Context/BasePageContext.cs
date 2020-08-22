@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NingyoRi
 {
-	public class BasePageContext : BaseContext
+	public abstract class BasePageContext : BaseContext
 	{
 
 	}

@@ -16,13 +16,15 @@ namespace NingyoRi
 		{
 			base.Awake();
 			GameManager.Instance.Init();
+
+			CoroutineManager.Instance.Init();
 		}
 
 		public override void Init()
 		{
+			AddGlobalManager(new ResourceManager());
 			AddGlobalManager(new TextMapManager());
 			AddGlobalManager(new InputManager());
-			AddGlobalManager(new ResourceManager());
 
 			AddLocalManager(new UIManager());
 			AddLocalManager(new EntityManager());

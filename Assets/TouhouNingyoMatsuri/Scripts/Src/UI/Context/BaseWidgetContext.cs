@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NingyoRi
 {
-	public class BaseWidgetContext : BaseContext
+	public abstract class BaseWidgetContext : BaseContext
 	{
 
 	}
