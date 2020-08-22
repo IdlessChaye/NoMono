@@ -9,14 +9,12 @@ namespace NingyoRi
 		private MonoMainMenuPage _mono;
 		public override void Init()
 		{
-			_prefabPath = @"UI/PageContext/MainMenuPage";
+			_prefabPath = @"UI/Contexts/PageContexts/MainMenuPage";
 		}
 
 		public override void Setup()
 		{
 			_mono = _monoContext as MonoMainMenuPage;
-			if (_mono == null)
-				Debug.LogError("No Mono!");
 
 		}
 

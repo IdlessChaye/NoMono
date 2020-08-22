@@ -9,6 +9,7 @@ namespace NingyoRi
 		Input,
 		Resource,
 		UI,
+		Music,
 		Entity,
 		None
 	}
@@ -16,6 +17,9 @@ namespace NingyoRi
 	public class BaseManager
 	{
 		public virtual ManagerType managerType { get { return ManagerType.None; } }
+
+		public bool needTick { get; set; }
+
 		public virtual void Init() { }
 
 
@@ -34,6 +38,7 @@ namespace NingyoRi
 
 	}
 
+	// LocalManager 在Scene切换时会被Destroy
 	public class BaseLocalManager : BaseManager
 	{
 		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
@@ -43,6 +48,8 @@ namespace NingyoRi
 
 	public class BaseGlobalManager : BaseManager
 	{
-		
+		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
+
+		public virtual void OnLevelUnLoaded(Scene scene) { }
 	}
 }

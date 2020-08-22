@@ -29,15 +29,7 @@ namespace NingyoRi
 			GetAudioClip("dBu music - 不思議な不思議なお祓い棒");
 			GetAudioClip("ジャージと愉快な仲間たち - 今日ぞハレの日、われらが祭り");
 			GetAudioClip("グーシャンダグー - 幽境奏楽");
-
-
 			GetAudioClip("市松椿 - 童祭　~ Innocent Treasures");
-			/*
-			GetAudioClip("ブラックオアホワイト - 超电动黒白人形型魔操合体玩具");
-			GetAudioClip("発热巫女~ず - Pages");
-			*/
-
-
 		}
 
 		public void Play(string musicName, float crossfade = 1500f)

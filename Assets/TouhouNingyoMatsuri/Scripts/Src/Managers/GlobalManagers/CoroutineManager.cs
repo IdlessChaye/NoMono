@@ -6,13 +6,13 @@ namespace NingyoRi
 {
 	public class CoroutineManager : FullSingleton<CoroutineManager>
 	{
-		private List<IEnumerator> enumeratorList = new List<IEnumerator>();
+		private List<IEnumerator> _coroutineList = new List<IEnumerator>();
 
 		public void AddCoroutine(float delay, System.Action action)
 		{
-			var ie = DelayCoroutine(delay, action);
-			enumeratorList.Add(ie);
-			StartCoroutine(ie);
+			var delayCorou = DelayCoroutine(delay, action);
+			_coroutineList.Add(delayCorou);
+			StartCoroutine(delayCorou);
 		}
 
 		private IEnumerator DelayCoroutine(float delay, System.Action action)
@@ -20,6 +20,12 @@ namespace NingyoRi
 			yield return new WaitForSeconds(delay);
 			if (action != null)
 				action();
+		}
+
+		public override void Destroy()
+		{
+			StopAllCoroutines();
+			_coroutineList.Clear();
 		}
 	}
 }

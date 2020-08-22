@@ -26,6 +26,13 @@ namespace NingyoRi
 			_uiCanvasPrefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.uiCanvasPath);
 			if (_uiCanvasPrefab == null)
 				throw new System.Exception("UIManager Init");
+
+			var _uiCanvasGO = GameObject.Find("UICanvas");
+			_uiCanvasRoot = _uiCanvasGO != null ? _uiCanvasGO.transform : null;
+			if (_uiCanvasRoot == null)
+				_uiCanvasRoot = GameObject.Instantiate(_uiCanvasPrefab).transform;
+			_pageContextRoot = _uiCanvasRoot.Find(@"Contexts/Pages");
+			_widgetContextRoot = _uiCanvasRoot.Find(@"Contexts/Widgets");
 		}
 
 		public void ShowPage(BasePageContext context)
@@ -59,20 +66,13 @@ namespace NingyoRi
 
 		public override void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
-			var _uiCanvasGO = GameObject.Find("UICanvas");
-			_uiCanvasRoot = _uiCanvasGO != null ? _uiCanvasGO.transform : null;
-			if (_uiCanvasRoot == null)
-				_uiCanvasRoot = GameObject.Instantiate(_uiCanvasPrefab).transform;
-			_pageContextRoot = _uiCanvasRoot.Find(@"Context/Pages");
-			_widgetContextRoot = _uiCanvasRoot.Find(@"Context/Widgets");
-
 			if (scene.name.Equals("Menu"))
 			{
 				Miscs.GetUIManager().ShowPage(new MainMenuPageContext());
 			}
 		}
 
-		public override void OnLevelUnLoaded(Scene scene)
+		public override void Destroy()
 		{
 			_uiCanvasRoot = null;
 			_pageContextRoot = null;
