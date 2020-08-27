@@ -5,7 +5,8 @@ using UnityEngine.SceneManagement;
 
 namespace NingyoRi
 {
-	public class UIManager : BaseLocalManager {
+	public class UIManager : BaseLocalManager
+	{
 		public override ManagerType managerType
 		{
 			get
@@ -37,8 +38,9 @@ namespace NingyoRi
 
 		public void ShowPage(BasePageContext context)
 		{
-			context.Show();
-			context.contextGO.transform.SetParent(_pageContextRoot, false);
+			if (context == null)
+				return;
+			context.Show(_pageContextRoot);
 			_contextList.Add(context);
 			if (context.needTick)
 				_tickContextList.Add(context);
@@ -46,19 +48,40 @@ namespace NingyoRi
 
 		public void ShowWidget(BaseWidgetContext context)
 		{
-			context.Show();
-			context.contextGO.transform.SetParent(_widgetContextRoot, false);
+			if (context == null)
+				return;
+			context.Show(_widgetContextRoot);
 			_contextList.Add(context);
 			if (context.needTick)
 				_tickContextList.Add(context);
 		}
 
+		public void ClosePage(BasePageContext context)
+		{
+			if (context == null)
+				return;
+			context.Close();
+			if (_tickContextList.Contains(context))
+				_tickContextList.Remove(context);
+			_contextList.Remove(context);
+		}
+
+		public void CloseWidget(BaseWidgetContext context)
+		{
+			if (context == null)
+				return;
+			context.Close();
+			if (_tickContextList.Contains(context))
+				_tickContextList.Remove(context);
+			_contextList.Remove(context);
+		}
+
 		public override void Tick2()
 		{
-			for(int i = 0;i < _tickContextList.Count; i++)
+			for (int i = 0; i < _tickContextList.Count; i++)
 			{
 				var context = _tickContextList[i];
-				if (context != null)
+				if (context != null && context.needTick)
 					context.Tick();
 			}
 		}
@@ -72,14 +95,26 @@ namespace NingyoRi
 			}
 		}
 
+		public override void OnLevelUnLoaded(Scene scene)
+		{
+			if (_contextList != null)
+			{
+				foreach (var context in _contextList)
+					context.Clear();
+			}
+		}
+
 		public override void Destroy()
 		{
 			_uiCanvasRoot = null;
 			_pageContextRoot = null;
 			_widgetContextRoot = null;
 			_tickContextList.Clear();
-			foreach (var context in _contextList)
-				context.Destroy();
+			if (_contextList != null)
+			{ 
+				foreach (var context in _contextList)
+					context.Destroy();
+			}
 			_contextList.Clear();
 		}
 

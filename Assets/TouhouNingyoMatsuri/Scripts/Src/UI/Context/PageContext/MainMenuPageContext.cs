@@ -7,19 +7,21 @@ namespace NingyoRi
 	public class MainMenuPageContext : BasePageContext
 	{
 		private MonoMainMenuPage _mono;
-		public override void Init()
+		protected override void Init()
 		{
 			_prefabPath = @"UI/Contexts/PageContexts/MainMenuPage";
 		}
 
-		public override void Setup()
+		protected override void Setup()
 		{
+			base.Setup();
 			_mono = _monoContext as MonoMainMenuPage;
-
+			needTick = false; //
 		}
 
-		public override void SetupCallbacks()
+		protected override void SetupCallbacks()
 		{
+			base.SetupCallbacks();
 			BindCallback(_mono.startButton, () => Debug.Log("Hello"));
 		}
 	}

@@ -17,7 +17,9 @@ namespace NingyoRi
 
 		protected string _prefabPath { get; set; }
 
-		public void Show()
+		private List<UnityEvent> _unityEventList;
+
+		public void Show(Transform pageContextRoot)
 		{
 			Init();
 
@@ -27,6 +29,7 @@ namespace NingyoRi
 			if (prefab == null)
 				throw new System.Exception("UIManager ShowPage.");
 			contextGO = GameObject.Instantiate(prefab);
+			contextGO.transform.SetParent(pageContextRoot, false);
 			_monoContext = contextGO.GetComponent<BaseMonoContext>();
 			if (_monoContext == null)
 				throw new System.Exception("UIManager ShowPage No BaseMonoPageContext.");
@@ -38,26 +41,67 @@ namespace NingyoRi
 				});
 		}
 
-		public abstract void Init();
+		public void Close()
+		{
+			Clear();
+			_monoContext.Hide();
+			CoroutineManager.Instance.AddCoroutine(0.5f, () => {
+				Destroy();
+			});
+		}
 
-		public virtual void Setup() { }
+		protected abstract void Init();
 
-		public virtual void SetupCallbacks() { }
+		protected virtual void Setup()
+		{
+			if (_unityEventList == null)
+				_unityEventList = new List<UnityEvent>(4);
+		}
 
-		public virtual void SetupEvents() { }
+		protected virtual void SetupCallbacks()
+		{
+
+		}
+
+		protected virtual void SetupEvents()
+		{
+
+		}
 
 		public virtual void Tick() { }
 
-		public virtual void Clear() { }
+		public virtual void Clear()
+		{
+			ClearAllUnityEvents();
+			_unityEventList = null;
+			needTick = false;
+		}
 
-		public virtual void Destroy() { }
-
+		public virtual void Destroy()
+		{
+			if (_monoContext != null)
+			{
+				GameObject.Destroy(_monoContext.contextGO);
+			}
+		}
 
 		protected void BindCallback(Button button, UnityAction action)
 		{
 			if (action == null)
 				return;
-			button.onClick.AddListener(action	);
+			_unityEventList.Add(button.onClick);
+			button.onClick.AddListener(action);
+		}
+
+		private void ClearAllUnityEvents()
+		{
+			if (_unityEventList == null)
+				return;
+			foreach(var unityEvent in _unityEventList)
+			{
+				unityEvent.RemoveAllListeners();
+			}
+			_unityEventList.Clear();
 		}
 	}
 }

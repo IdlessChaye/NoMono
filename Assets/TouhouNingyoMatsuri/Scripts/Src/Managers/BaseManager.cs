@@ -36,20 +36,20 @@ namespace NingyoRi
 
 		public virtual void Destroy() { }
 
+		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
+
+		public virtual void OnLevelUnLoaded(Scene scene) { }
+
 	}
 
 	// LocalManager 在Scene切换时会被Destroy
 	public class BaseLocalManager : BaseManager
 	{
-		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
-
-		public virtual void OnLevelUnLoaded(Scene scene) { }
+		
 	}
 
 	public class BaseGlobalManager : BaseManager
 	{
-		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
 
-		public virtual void OnLevelUnLoaded(Scene scene) { }
 	}
 }
