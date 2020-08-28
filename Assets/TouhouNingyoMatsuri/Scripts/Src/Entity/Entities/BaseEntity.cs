@@ -9,6 +9,7 @@ namespace NingyoRi
 	{
 		public abstract EntityType entityType { get; }
 		public bool needTick { get; private set; }
+		public bool isActive { get; private set; }
 		public uint entityId { get; private set; }
 
 		protected BaseMonoPlugin _monoPlugin { get; private set; }
@@ -17,10 +18,13 @@ namespace NingyoRi
 		private LinkedList<BaseComponent> _compLinList = new LinkedList<BaseComponent>();
 		private LinkedList<BaseComponent> _tickCompLinList = new LinkedList<BaseComponent>();
 		private Dictionary<uint, BaseComponent> _type2compDict = new Dictionary<uint, BaseComponent>(8);
+
 		private LinkedList<BaseComponent> _destroyCompLinList;
 
 		public void Create(uint entityId)
 		{
+			SetActive(true);
+
 			Init();
 
 			this.entityId = entityId;
@@ -44,6 +48,8 @@ namespace NingyoRi
 
 		public void Tick0()
 		{
+			if (isActive == false)
+				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
@@ -59,6 +65,8 @@ namespace NingyoRi
 
 		public void Tick1()
 		{
+			if (isActive == false)
+				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
@@ -74,6 +82,8 @@ namespace NingyoRi
 
 		public void Tick2()
 		{
+			if (isActive == false)
+				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
@@ -89,6 +99,8 @@ namespace NingyoRi
 
 		public void Tick3()
 		{
+			if (isActive == false)
+				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
@@ -104,6 +116,8 @@ namespace NingyoRi
 
 		public void Tick4()
 		{
+			if (isActive == false)
+				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
@@ -135,7 +149,7 @@ namespace NingyoRi
 				}
 			}
 
-			needTick = false;
+			SetActive(false);
 		}
 
 		public virtual void Destroy()
@@ -160,6 +174,10 @@ namespace NingyoRi
 			}
 		}
 
+		public void SetActive(bool isActive)
+		{
+			this.isActive = isActive;
+		}
 
 		public T GetComponent<T>(ComponentType compType) where T: BaseComponent
 		{

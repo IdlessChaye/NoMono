@@ -8,12 +8,14 @@ namespace NingyoRi
 	{
 		public abstract ComponentType compType { get; }
 		public bool needTick { get; private set; }
+		public bool isEnable { get; private set; }
 
 		protected BaseEntity _entity { get; private set; }
 
-		public void Init(BaseEntity entity)
+		public virtual void Init(BaseEntity entity)
 		{
 			this._entity = entity;
+			SetEnable(true);
 		}
 
 		public virtual void OnAdd() { }
@@ -29,8 +31,13 @@ namespace NingyoRi
 		public virtual void OnRemoved() { }
 		public virtual void Destroy()
 		{
-			needTick = false;
+			SetEnable(false);
 			_entity = null;
+		}
+
+		public void SetEnable(bool isEnable)
+		{
+			this.isEnable = isEnable;
 		}
 
 		public BaseEntity GetEntity()
