@@ -14,19 +14,50 @@ namespace NingyoRi
 		private List<BaseGlobalManager> _tickGlobalManagerList = new List<BaseGlobalManager>(4);
 		private List<BaseLocalManager> _tickLocalManagerList = new List<BaseLocalManager>(4);
 
-		public override void Awake()
-		{
-			base.Awake();
-			GameManager.Instance.Init();
 
-			CoroutineManager.Instance.Init();
+		private void AddFullManagers()
+		{
+			GameManager.Instance.Init();
+			FullCoroutineManager.Instance.Init();
+			FullMusicManager.Instance.Init();
 		}
 
-		public override void Init()
+		private void AddGlobalManagers()
 		{
 			AddGlobalManager(new ResourceManager());
 			AddGlobalManager(new TextMapManager());
 			AddGlobalManager(new InputManager());
+		}
+
+		private void AddLocalManagers(string sceneName)
+		{
+			if (sceneName.Equals("Menu"))
+			{
+				AddLocalManager(new UIManager());
+			}
+			else if (sceneName.Equals("MainLevel"))
+			{
+				AddLocalManager(new UIManager());
+				AddLocalManager(new EntityManager());
+			}
+		}
+
+		private void RemoveFullManagers()
+		{
+			FullMusicManager.Instance.Destroy();
+			FullCoroutineManager.Instance.Destroy();
+		}
+
+
+		public override void Awake()
+		{
+			base.Awake();
+			AddFullManagers();
+		}
+
+		public override void Init()
+		{
+			AddGlobalManagers();
 
 			SceneManager.sceneLoaded += OnSceneLoaded;
 			SceneManager.sceneUnloaded += OnSceneUnloaded;
@@ -71,7 +102,8 @@ namespace NingyoRi
 
 		public void QuitGame()
 		{
-			CoroutineManager.Instance.Destroy();
+			RemoveFullManagers();
+
 			this.Destroy();
 		}
 
@@ -131,16 +163,7 @@ namespace NingyoRi
 
 		private void OnLocalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
-			var sceneName = scene.name;
-			if (sceneName.Equals("Menu"))
-			{
-				AddLocalManager(new UIManager());
-			}
-			else if (sceneName.Equals("MainLevel"))
-			{
-				AddLocalManager(new UIManager());
-				AddLocalManager(new EntityManager());
-			}
+			AddLocalManagers(scene.name);
 
 			for (int i = _localManagerList.Count - 1; i >= 0; i--)
 			{

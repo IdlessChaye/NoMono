@@ -3,17 +3,6 @@ using UnityEngine.SceneManagement;
 
 namespace NingyoRi
 {
-	public enum ManagerType
-	{
-		TextMap,
-		Input,
-		Resource,
-		UI,
-		Music,
-		Entity,
-		None
-	}
-
 	public class BaseManager
 	{
 		public virtual ManagerType managerType { get { return ManagerType.None; } }

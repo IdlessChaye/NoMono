@@ -11,15 +11,9 @@ namespace NingyoRi
 		Up
 	}
 
-	public class InputManager : BaseGlobalManager
+	public partial class InputManager : BaseGlobalManager
 	{
-		public override ManagerType managerType
-		{
-			get
-			{
-				return ManagerType.Input;
-			}
-		}
+
 		public override void Init()
 		{
 			

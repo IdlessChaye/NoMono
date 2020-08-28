@@ -5,15 +5,8 @@ using UnityEngine;
 namespace NingyoRi
 {
 
-	public class ResourceManager : BaseGlobalManager
+	public partial class ResourceManager : BaseGlobalManager
 	{
-		public override ManagerType managerType
-		{
-			get
-			{
-				return ManagerType.Resource;
-			}
-		}
 
 		private Dictionary<string, Object> _prefabDict = new Dictionary<string, Object>();
 

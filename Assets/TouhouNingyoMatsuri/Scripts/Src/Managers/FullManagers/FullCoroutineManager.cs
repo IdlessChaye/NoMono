@@ -4,9 +4,14 @@ using UnityEngine;
 
 namespace NingyoRi
 {
-	public class CoroutineManager : FullSingleton<CoroutineManager>
+	public class FullCoroutineManager : FullSingleton<FullCoroutineManager>
 	{
 		private List<IEnumerator> _coroutineList = new List<IEnumerator>();
+
+		public override void Init()
+		{
+			gameObject.name = "FullCoroutineManager";
+		}
 
 		public void AddCoroutine(float delay, System.Action action)
 		{

@@ -11,8 +11,8 @@ namespace NingyoRi
 		public string nowPlayingName;
 
 		private AudioSource audioSource;
-		private Dictionary<string, AudioClip> AudioClipDict = new Dictionary<string, AudioClip>();
-		private const string MusicResourcesRootPath = "C_Music/";
+		private Dictionary<string, AudioClip> audioClipDict = new Dictionary<string, AudioClip>();
+		private const string MusicResourcesRootPath = "Music/";
 		private float volume;
 		private IEnumerator coroutine;
 
@@ -25,11 +25,7 @@ namespace NingyoRi
 			audioSource.volume = volume;
 			nowPlayingName = "希腊奶";
 
-			GetAudioClip("趣味工房にんじんわいん - 添い寝人形");
-			GetAudioClip("dBu music - 不思議な不思議なお祓い棒");
-			GetAudioClip("ジャージと愉快な仲間たち - 今日ぞハレの日、われらが祭り");
-			GetAudioClip("グーシャンダグー - 幽境奏楽");
-			GetAudioClip("市松椿 - 童祭　~ Innocent Treasures");
+			//GetAudioClip("趣味工房にんじんわいん - 添い寝人形");
 		}
 
 		public void Play(string musicName, float crossfade = 1500f)
@@ -117,23 +113,23 @@ namespace NingyoRi
 
 		private AudioClip GetAudioClip(string musicName)
 		{
-			if (AudioClipDict.ContainsKey(musicName) == true)
+			if (audioClipDict.ContainsKey(musicName) == true)
 			{
-				if (AudioClipDict[musicName] == null)
+				if (audioClipDict[musicName] == null)
 				{
 					AudioClip audioClip = Resources.Load(MusicResourcesRootPath + musicName) as AudioClip;
-					AudioClipDict[musicName] = audioClip;
+					audioClipDict[musicName] = audioClip;
 					return audioClip;
 				}
 				else
 				{
-					return AudioClipDict[musicName];
+					return audioClipDict[musicName];
 				}
 			}
 			else
 			{
 				AudioClip audioClip = Resources.Load(MusicResourcesRootPath + musicName) as AudioClip;
-				AudioClipDict.Add(musicName, audioClip);
+				audioClipDict.Add(musicName, audioClip);
 				return audioClip;
 			}
 		}

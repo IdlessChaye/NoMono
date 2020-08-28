@@ -5,20 +5,13 @@ using UnityEngine.SceneManagement;
 
 namespace NingyoRi
 {
-	public class UIManager : BaseLocalManager
+	public partial class UIManager : BaseLocalManager
 	{
-		public override ManagerType managerType
-		{
-			get
-			{
-				return ManagerType.UI;
-			}
-		}
-
 		private GameObject _uiCanvasPrefab;
 		private Transform _uiCanvasRoot;
 		private Transform _pageContextRoot;
 		private Transform _widgetContextRoot;
+
 		private List<BaseContext> _contextList = new List<BaseContext>();
 		private List<BaseContext> _tickContextList = new List<BaseContext>();
 

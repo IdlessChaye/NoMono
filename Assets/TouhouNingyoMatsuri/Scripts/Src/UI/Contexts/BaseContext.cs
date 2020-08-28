@@ -34,8 +34,8 @@ namespace NingyoRi
 			if (_monoContext == null)
 				throw new System.Exception("UIManager ShowPage No BaseMonoPageContext.");
 			_monoContext.Show();
-			CoroutineManager.Instance.AddCoroutine(0.5f, () => {
-				Setup();
+			Setup();
+			FullCoroutineManager.Instance.AddCoroutine(0.5f, () => {
 				SetupCallbacks();
 				SetupEvents();
 				});
@@ -45,7 +45,7 @@ namespace NingyoRi
 		{
 			Clear();
 			_monoContext.Hide();
-			CoroutineManager.Instance.AddCoroutine(0.5f, () => {
+			FullCoroutineManager.Instance.AddCoroutine(0.5f, () => {
 				Destroy();
 			});
 		}

@@ -4,11 +4,8 @@ using UnityEngine;
 
 namespace NingyoRi
 {
-	public partial class EntityManager : BaseLocalManager
+	public class BaseComponent
 	{
-
-
 
 	}
 }
-

@@ -12,15 +12,8 @@ namespace NingyoRi
 		English
 	}
 
-	public class TextMapManager : BaseGlobalManager
+	public partial class TextMapManager : BaseGlobalManager
 	{
-		public override ManagerType managerType
-		{
-			get
-			{
-				return ManagerType.TextMap;
-			}
-		}
 
 		private const string PATH = @"TextMap/TextMap";
 
