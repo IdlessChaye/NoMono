@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace NingyoRi
 {
-	public abstract class CharacterEntity : BaseEntity
+	public enum ComponentType
 	{
 
 	}

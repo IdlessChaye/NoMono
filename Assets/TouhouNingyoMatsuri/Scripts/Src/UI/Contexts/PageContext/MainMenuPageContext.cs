@@ -16,7 +16,7 @@ namespace NingyoRi
 		{
 			base.Setup();
 			_mono = _monoContext as MonoMainMenuPage;
-			needTick = false; //
+			//needTick = false; // 需要在BaseContext里加一个needTick开关方法
 		}
 
 		protected override void SetupCallbacks()

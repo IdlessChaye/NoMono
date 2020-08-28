@@ -3,9 +3,9 @@ using UnityEngine.SceneManagement;
 
 namespace NingyoRi
 {
-	public class BaseManager
+	public abstract class BaseManager
 	{
-		public virtual ManagerType managerType { get { return ManagerType.None; } }
+		public abstract ManagerType managerType { get; }
 
 		public bool needTick { get; set; }
 
@@ -32,12 +32,12 @@ namespace NingyoRi
 	}
 
 	// LocalManager 在Scene切换时会被Destroy
-	public class BaseLocalManager : BaseManager
+	public abstract class BaseLocalManager : BaseManager
 	{
 		
 	}
 
-	public class BaseGlobalManager : BaseManager
+	public abstract class BaseGlobalManager : BaseManager
 	{
 
 	}

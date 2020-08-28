@@ -11,7 +11,7 @@ namespace NingyoRi
 		[HideInInspector]
 		public GameObject contextGO;
 
-		public bool needTick { get; set; }
+		public bool needTick { get; private set; }
 
 		protected BaseMonoContext _monoContext;
 

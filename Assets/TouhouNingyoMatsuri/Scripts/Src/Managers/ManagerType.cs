@@ -11,7 +11,6 @@ namespace NingyoRi
 		Resource,
 		UI,
 		Entity,
-		Music,
 		None
 	}
 

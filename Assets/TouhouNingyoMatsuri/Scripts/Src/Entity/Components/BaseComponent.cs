@@ -4,8 +4,39 @@ using UnityEngine;
 
 namespace NingyoRi
 {
-	public class BaseComponent
+	public abstract class BaseComponent
 	{
+		public abstract ComponentType compType { get; }
+		public bool needTick { get; private set; }
+
+		protected BaseEntity _entity { get; private set; }
+
+		public void Init(BaseEntity entity)
+		{
+			this._entity = entity;
+		}
+
+		public virtual void OnAdd() { }
+		public virtual void OnAdded() { }
+
+		public virtual void Tick0() { }
+		public virtual void Tick1() { }
+		public virtual void Tick2() { }
+		public virtual void Tick3() { }
+		public virtual void Tick4() { }
+
+		public virtual void OnRemove() { }
+		public virtual void OnRemoved() { }
+		public virtual void Destroy()
+		{
+			needTick = false;
+			_entity = null;
+		}
+
+		public BaseEntity GetEntity()
+		{
+			return _entity;
+		}
 
 	}
 }
