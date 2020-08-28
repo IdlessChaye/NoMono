@@ -47,7 +47,7 @@ namespace NingyoRi
 			{
 				value = node.Value;
 				node = node.Next;
-				if (value != null && value.needTick)
+				if (value != null && value.needTick && value.isActive)
 				{
 					value.Tick2();
 				}

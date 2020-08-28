@@ -48,15 +48,13 @@ namespace NingyoRi
 
 		public void Tick0()
 		{
-			if (isActive == false)
-				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
 				node = node.Next;
-				if (value != null && value.needTick)
+				if (value != null && value.needTick && value.isEnable)
 				{
 					value.Tick0();
 				}
@@ -65,15 +63,13 @@ namespace NingyoRi
 
 		public void Tick1()
 		{
-			if (isActive == false)
-				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
 				node = node.Next;
-				if (value != null && value.needTick)
+				if (value != null && value.needTick && value.isEnable)
 				{
 					value.Tick1();
 				}
@@ -82,15 +78,13 @@ namespace NingyoRi
 
 		public void Tick2()
 		{
-			if (isActive == false)
-				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
 				node = node.Next;
-				if (value != null && value.needTick)
+				if (value != null && value.needTick && value.isEnable)
 				{
 					value.Tick2();
 				}
@@ -99,15 +93,13 @@ namespace NingyoRi
 
 		public void Tick3()
 		{
-			if (isActive == false)
-				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
 				node = node.Next;
-				if (value != null && value.needTick)
+				if (value != null && value.needTick && value.isEnable)
 				{
 					value.Tick3();
 				}
@@ -116,15 +108,13 @@ namespace NingyoRi
 
 		public void Tick4()
 		{
-			if (isActive == false)
-				return;
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
 				node = node.Next;
-				if (value != null && value.needTick)
+				if (value != null && value.needTick && value.isEnable)
 				{
 					value.Tick4();
 				}
