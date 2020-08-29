@@ -11,3 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/TouhouNingyoMatsuri/Scenes/Menu.unity
     guid: 9f541dc26ca53014a814820cea63fe32
+  - enabled: 1
+    path: Assets/TouhouNingyoMatsuri/Scenes/Loading.unity
+    guid: 6d7d129c5d3ebc540b087186e41ff6f6
+  - enabled: 1
+    path: Assets/TouhouNingyoMatsuri/Scenes/MainLevel.unity
+    guid: 4bc8c8f1cb8a921418f66ab38a7e99cc
+  - enabled: 1
+    path: Assets/TouhouNingyoMatsuri/Scenes/Final.unity
+    guid: e82cf57e149617c4394b3fc46b0069e8

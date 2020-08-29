@@ -25,6 +25,7 @@ namespace NingyoRi
 			_entityLinList.AddLast(entity);
 			if (entity.needTick)
 				_tickEntityLinList.AddLast(entity);
+			_id2entityDict.Add(entity.entityId, entity);
 		}
 
 		public void RemoveEntity(BaseEntity entity)
@@ -32,6 +33,7 @@ namespace NingyoRi
 			if (entity == null)
 				return;
 			entity.Desert();
+			_id2entityDict.Remove(entity.entityId);
 			if (_tickEntityLinList.Contains(entity))
 				_tickEntityLinList.Remove(entity);
 			_entityLinList.Remove(entity);
@@ -94,6 +96,15 @@ namespace NingyoRi
 				}
 			}
 			_entityLinList.Clear();
+			_id2entityDict.Clear();
+		}
+
+		public BaseEntity GetEntity(uint entityId)
+		{
+			BaseEntity entity;
+			if (_id2entityDict.TryGetValue(entityId,out entity) == false)
+				return null;
+			return entity;
 		}
 
 	}

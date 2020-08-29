@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65d4a750c973dd64e867f590fe27de04, type: 3}
+  m_Name: NingyoSpawn
+  m_EditorClassIdentifier: 
+  spawnPositions:
+  - {x: 7.31, y: 1.24, z: 1.3}
+  - {x: 5, y: 1.43, z: 3.22}
+  - {x: 0.7, y: 1.43, z: 3.23}
+  - {x: -3.14, y: 1.8, z: 2.69}
+  - {x: -5.188, y: 1.8, z: 0.43}
+  - {x: -3.07, y: 1.8, z: -1.75}
+  - {x: -4.79, y: 4.86, z: -1.1}
+  - {x: -4.698, y: 4.86, z: 2.068}
+  - {x: 5.18, y: 6.84, z: 0.27}
+  spawnRotations:
+  - {x: 0, y: 88.693, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: -90, z: 0}
+  - {x: 0, y: 180, z: 0}
+  - {x: 0, y: -135, z: 0}
+  - {x: 0, y: -45, z: 0}
+  - {x: 0, y: 90, z: 0}

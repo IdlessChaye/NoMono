@@ -20,10 +20,11 @@
  * 
  */
 
-//#define LOG_ALL_MESSAGES
+ // 打包的时候再去掉这个宏
+#define LOG_ALL_MESSAGES
 //#define LOG_ADD_LISTENER
 //#define LOG_BROADCAST_MESSAGE
-#define REQUIRE_LISTENER
+//#define REQUIRE_LISTENER
 
 using System;
 using System.Collections.Generic;
@@ -41,17 +42,17 @@ namespace NingyoRi
 		static private MessengerHelper messengerHelper = (new GameObject("MessengerHelper")).AddComponent<MessengerHelper>();
 #pragma warning restore 0414
 
-		static public Dictionary<string, Delegate> eventTable = new Dictionary<string, Delegate>();
+		static public Dictionary<uint, Delegate> eventTable = new Dictionary<uint, Delegate>();
 
 		//Message handlers that should never be removed, regardless of calling Cleanup
-		static public List<string> permanentMessages = new List<string>();
+		static public List<uint> permanentMessages = new List<uint>();
 		#endregion
 		#region Helper methods
 		//Marks a certain message as permanent.
-		static public void MarkAsPermanent(string eventType)
+		static public void MarkAsPermanent(uint eventType)
 		{
 #if LOG_ALL_MESSAGES
-		Debug.Log("Messenger MarkAsPermanent \t\"" + eventType + "\"");
+		Debug.Log("Messenger MarkAsPermanent \t\"" + eventType.ToString() + "\"");
 #endif
 
 			permanentMessages.Add(eventType);
@@ -63,13 +64,13 @@ namespace NingyoRi
 		Debug.Log("MESSENGER Cleanup. Make sure that none of necessary listeners are removed.");
 #endif
 
-			List<string> messagesToRemove = new List<string>();
+			List<uint> messagesToRemove = new List<uint>();
 
-			foreach (KeyValuePair<string, Delegate> pair in eventTable)
+			foreach (KeyValuePair<uint, Delegate> pair in eventTable)
 			{
 				bool wasFound = false;
 
-				foreach (string message in permanentMessages)
+				foreach (uint message in permanentMessages)
 				{
 					if (pair.Key == message)
 					{
@@ -82,7 +83,7 @@ namespace NingyoRi
 					messagesToRemove.Add(pair.Key);
 			}
 
-			foreach (string message in messagesToRemove)
+			foreach (uint message in messagesToRemove)
 			{
 				eventTable.Remove(message);
 			}
@@ -92,7 +93,7 @@ namespace NingyoRi
 		{
 			Debug.Log("\t\t\t=== MESSENGER PrintEventTable ===");
 
-			foreach (KeyValuePair<string, Delegate> pair in eventTable)
+			foreach (KeyValuePair<uint, Delegate> pair in eventTable)
 			{
 				Debug.Log("\t\t\t" + pair.Key + "\t\t" + pair.Value);
 			}
@@ -102,10 +103,10 @@ namespace NingyoRi
 		#endregion
 
 		#region Message logging and exception throwing
-		static public void OnListenerAdding(string eventType, Delegate listenerBeingAdded)
+		static public void OnListenerAdding(uint eventType, Delegate listenerBeingAdded)
 		{
 #if LOG_ALL_MESSAGES || LOG_ADD_LISTENER
-		Debug.Log("MESSENGER OnListenerAdding \t\"" + eventType + "\"\t{" + listenerBeingAdded.Target + " -> " + listenerBeingAdded.Method + "}");
+		Debug.Log("MESSENGER OnListenerAdding \t\"" + eventType.ToString() + "\"\t{" + listenerBeingAdded.Target + " -> " + listenerBeingAdded.Method + "}");
 #endif
 
 			if (!eventTable.ContainsKey(eventType))
@@ -116,14 +117,14 @@ namespace NingyoRi
 			Delegate d = eventTable[eventType];
 			if (d != null && d.GetType() != listenerBeingAdded.GetType())
 			{
-				throw new ListenerException(string.Format("Attempting to add listener with inconsistent signature for event type {0}. Current listeners have type {1} and listener being added has type {2}", eventType, d.GetType().Name, listenerBeingAdded.GetType().Name));
+				throw new ListenerException(string.Format("Attempting to add listener with inconsistent signature for event type {0}. Current listeners have type {1} and listener being added has type {2}", eventType.ToString(), d.GetType().Name, listenerBeingAdded.GetType().Name));
 			}
 		}
 
-		static public void OnListenerRemoving(string eventType, Delegate listenerBeingRemoved)
+		static public void OnListenerRemoving(uint eventType, Delegate listenerBeingRemoved)
 		{
 #if LOG_ALL_MESSAGES
-		Debug.Log("MESSENGER OnListenerRemoving \t\"" + eventType + "\"\t{" + listenerBeingRemoved.Target + " -> " + listenerBeingRemoved.Method + "}");
+		Debug.Log("MESSENGER OnListenerRemoving \t\"" + eventType.ToString() + "\"\t{" + listenerBeingRemoved.Target + " -> " + listenerBeingRemoved.Method + "}");
 #endif
 
 			if (eventTable.ContainsKey(eventType))
@@ -132,20 +133,20 @@ namespace NingyoRi
 
 				if (d == null)
 				{
-					throw new ListenerException(string.Format("Attempting to remove listener with for event type \"{0}\" but current listener is null.", eventType));
+					throw new ListenerException(string.Format("Attempting to remove listener with for event type \"{0}\" but current listener is null.", eventType.ToString()));
 				}
 				else if (d.GetType() != listenerBeingRemoved.GetType())
 				{
-					throw new ListenerException(string.Format("Attempting to remove listener with inconsistent signature for event type {0}. Current listeners have type {1} and listener being removed has type {2}", eventType, d.GetType().Name, listenerBeingRemoved.GetType().Name));
+					throw new ListenerException(string.Format("Attempting to remove listener with inconsistent signature for event type {0}. Current listeners have type {1} and listener being removed has type {2}", eventType.ToString(), d.GetType().Name, listenerBeingRemoved.GetType().Name));
 				}
 			}
 			else
 			{
-				throw new ListenerException(string.Format("Attempting to remove listener for type \"{0}\" but Messenger doesn't know about this event type.", eventType));
+				throw new ListenerException(string.Format("Attempting to remove listener for type \"{0}\" but Messenger doesn't know about this event type.", eventType.ToString()));
 			}
 		}
 
-		static public void OnListenerRemoved(string eventType)
+		static public void OnListenerRemoved(uint eventType)
 		{
 			if (eventTable[eventType] == null)
 			{
@@ -153,19 +154,19 @@ namespace NingyoRi
 			}
 		}
 
-		static public void OnBroadcasting(string eventType)
+		static public void OnBroadcasting(uint eventType)
 		{
 #if REQUIRE_LISTENER
 			if (!eventTable.ContainsKey(eventType))
 			{
-				throw new BroadcastException(string.Format("Broadcasting message \"{0}\" but no listener found. Try marking the message with Messenger.MarkAsPermanent.", eventType));
+				throw new BroadcastException(string.Format("Broadcasting message \"{0}\" but no listener found. Try marking the message with Messenger.MarkAsPermanent.", eventType.ToString()));
 			}
 #endif
 		}
 
-		static public BroadcastException CreateBroadcastSignatureException(string eventType)
+		static public BroadcastException CreateBroadcastSignatureException(uint eventType)
 		{
-			return new BroadcastException(string.Format("Broadcasting message \"{0}\" but listeners have a different signature than the broadcaster.", eventType));
+			return new BroadcastException(string.Format("Broadcasting message \"{0}\" but listeners have a different signature than the broadcaster.", eventType.ToString()));
 		}
 
 		public class BroadcastException : Exception
@@ -187,28 +188,28 @@ namespace NingyoRi
 
 		#region AddListener
 		//No parameters
-		static public void AddListener(string eventType, Callback handler)
+		static public void AddListener(uint eventType, Callback handler)
 		{
 			OnListenerAdding(eventType, handler);
 			eventTable[eventType] = (Callback)eventTable[eventType] + handler;
 		}
 
 		//Single parameter
-		static public void AddListener<T>(string eventType, Callback<T> handler)
+		static public void AddListener<T>(uint eventType, Callback<T> handler)
 		{
 			OnListenerAdding(eventType, handler);
 			eventTable[eventType] = (Callback<T>)eventTable[eventType] + handler;
 		}
 
 		//Two parameters
-		static public void AddListener<T, U>(string eventType, Callback<T, U> handler)
+		static public void AddListener<T, U>(uint eventType, Callback<T, U> handler)
 		{
 			OnListenerAdding(eventType, handler);
 			eventTable[eventType] = (Callback<T, U>)eventTable[eventType] + handler;
 		}
 
 		//Three parameters
-		static public void AddListener<T, U, V>(string eventType, Callback<T, U, V> handler)
+		static public void AddListener<T, U, V>(uint eventType, Callback<T, U, V> handler)
 		{
 			OnListenerAdding(eventType, handler);
 			eventTable[eventType] = (Callback<T, U, V>)eventTable[eventType] + handler;
@@ -217,7 +218,7 @@ namespace NingyoRi
 
 		#region RemoveListener
 		//No parameters
-		static public void RemoveListener(string eventType, Callback handler)
+		static public void RemoveListener(uint eventType, Callback handler)
 		{
 			OnListenerRemoving(eventType, handler);
 			eventTable[eventType] = (Callback)eventTable[eventType] - handler;
@@ -225,7 +226,7 @@ namespace NingyoRi
 		}
 
 		//Single parameter
-		static public void RemoveListener<T>(string eventType, Callback<T> handler)
+		static public void RemoveListener<T>(uint eventType, Callback<T> handler)
 		{
 			OnListenerRemoving(eventType, handler);
 			eventTable[eventType] = (Callback<T>)eventTable[eventType] - handler;
@@ -233,7 +234,7 @@ namespace NingyoRi
 		}
 
 		//Two parameters
-		static public void RemoveListener<T, U>(string eventType, Callback<T, U> handler)
+		static public void RemoveListener<T, U>(uint eventType, Callback<T, U> handler)
 		{
 			OnListenerRemoving(eventType, handler);
 			eventTable[eventType] = (Callback<T, U>)eventTable[eventType] - handler;
@@ -241,7 +242,7 @@ namespace NingyoRi
 		}
 
 		//Three parameters
-		static public void RemoveListener<T, U, V>(string eventType, Callback<T, U, V> handler)
+		static public void RemoveListener<T, U, V>(uint eventType, Callback<T, U, V> handler)
 		{
 			OnListenerRemoving(eventType, handler);
 			eventTable[eventType] = (Callback<T, U, V>)eventTable[eventType] - handler;
@@ -251,10 +252,10 @@ namespace NingyoRi
 
 		#region Broadcast
 		//No parameters
-		static public void Broadcast(string eventType)
+		static public void Broadcast(uint eventType)
 		{
 #if LOG_ALL_MESSAGES || LOG_BROADCAST_MESSAGE
-		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType + "\"");
+		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType.ToString() + "\"");
 #endif
 			OnBroadcasting(eventType);
 
@@ -275,10 +276,10 @@ namespace NingyoRi
 		}
 
 		//Single parameter
-		static public void Broadcast<T>(string eventType, T arg1)
+		static public void Broadcast<T>(uint eventType, T arg1)
 		{
 #if LOG_ALL_MESSAGES || LOG_BROADCAST_MESSAGE
-		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType + "\"");
+		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType.ToString() + "\"");
 #endif
 			OnBroadcasting(eventType);
 
@@ -299,10 +300,10 @@ namespace NingyoRi
 		}
 
 		//Two parameters
-		static public void Broadcast<T, U>(string eventType, T arg1, U arg2)
+		static public void Broadcast<T, U>(uint eventType, T arg1, U arg2)
 		{
 #if LOG_ALL_MESSAGES || LOG_BROADCAST_MESSAGE
-		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType + "\"");
+		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType.ToString() + "\"");
 #endif
 			OnBroadcasting(eventType);
 
@@ -323,10 +324,10 @@ namespace NingyoRi
 		}
 
 		//Three parameters
-		static public void Broadcast<T, U, V>(string eventType, T arg1, U arg2, V arg3)
+		static public void Broadcast<T, U, V>(uint eventType, T arg1, U arg2, V arg3)
 		{
 #if LOG_ALL_MESSAGES || LOG_BROADCAST_MESSAGE
-		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType + "\"");
+		Debug.Log("MESSENGER\t" + System.DateTime.Now.ToString("hh:mm:ss.fff") + "\t\t\tInvoking \t\"" + eventType.ToString() + "\"");
 #endif
 			OnBroadcasting(eventType);
 

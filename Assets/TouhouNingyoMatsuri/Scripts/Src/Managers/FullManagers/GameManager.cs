@@ -9,7 +9,7 @@ namespace NingyoRi
 	{
 		private List<BaseGlobalManager> _globalManagerList = new List<BaseGlobalManager>(8);
 		private List<BaseLocalManager> _localManagerList = new List<BaseLocalManager>(8);
-		private Dictionary<ManagerType, BaseManager> _managerDict = new Dictionary<ManagerType, BaseManager>(16);
+		private Dictionary<uint, BaseManager> _managerDict = new Dictionary<uint, BaseManager>(16);
 
 		private List<BaseGlobalManager> _tickGlobalManagerList = new List<BaseGlobalManager>(4);
 		private List<BaseLocalManager> _tickLocalManagerList = new List<BaseLocalManager>(4);
@@ -53,6 +53,8 @@ namespace NingyoRi
 		{
 			base.Awake();
 			AddFullManagers();
+
+			Messenger.Broadcast((uint)EventType.GameStart);
 		}
 
 		public override void Init()
@@ -69,13 +71,13 @@ namespace NingyoRi
 				return;
 			if (_globalManagerList.Contains(manager))
 				return;
-			if (_managerDict.ContainsKey(manager.managerType))
+			if (_managerDict.ContainsKey((uint)manager.managerType))
 				return;
 			manager.Init();
 			_globalManagerList.Add(manager);
 			if (manager.needTick)
 				_tickGlobalManagerList.Add(manager);
-			_managerDict.Add(manager.managerType, manager);
+			_managerDict.Add((uint)manager.managerType, manager);
 		}
 
 		private void AddLocalManager(BaseLocalManager manager)
@@ -84,20 +86,21 @@ namespace NingyoRi
 				return;
 			if (_localManagerList.Contains(manager))
 				return;
-			if (_managerDict.ContainsKey(manager.managerType))
+			if (_managerDict.ContainsKey((uint)manager.managerType))
 				return;
 			manager.Init();
 			_localManagerList.Add(manager);
 			if (manager.needTick)
 				_tickLocalManagerList.Add(manager);
-			_managerDict.Add(manager.managerType, manager);
+			_managerDict.Add((uint)manager.managerType, manager);
 		}
 
 		public T GetManager<T>(ManagerType type) where T: class
 		{
-			if (_managerDict.ContainsKey(type) == false)
+			BaseManager manager;
+			if (_managerDict.TryGetValue((uint)type, out manager) == false)
 				return null;
-			return _managerDict[type] as T;
+			return manager as T;
 		}
 
 		public void QuitGame()
@@ -115,8 +118,7 @@ namespace NingyoRi
 				if (manager != null)
 				{
 					manager.Destroy();
-					if (_managerDict.ContainsKey(manager.managerType))
-						_managerDict.Remove(manager.managerType);
+					_managerDict.Remove((uint)manager.managerType);
 				}
 			}
 
@@ -129,8 +131,7 @@ namespace NingyoRi
 				if (manager != null)
 				{
 					manager.Destroy();
-					if (_managerDict.ContainsKey(manager.managerType))
-						_managerDict.Remove(manager.managerType);
+					_managerDict.Remove((uint)manager.managerType);
 				}
 			}
 
@@ -193,8 +194,7 @@ namespace NingyoRi
 				if (manager != null)
 				{
 					manager.Destroy();
-					if (_managerDict.ContainsKey(manager.managerType))
-						_managerDict.Remove(manager.managerType);
+					_managerDict.Remove((uint)manager.managerType);
 				}
 			}
 

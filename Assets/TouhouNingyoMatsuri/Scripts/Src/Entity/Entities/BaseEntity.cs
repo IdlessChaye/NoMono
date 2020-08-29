@@ -172,11 +172,12 @@ namespace NingyoRi
 		public T GetComponent<T>(ComponentType compType) where T: BaseComponent
 		{
 			uint typeId = (uint)compType;
-			if (_type2compDict.ContainsKey(typeId))
+			BaseComponent component;
+			if (_type2compDict.TryGetValue(typeId, out component) == false)
 			{
-				return _type2compDict[typeId] as T;
+				return null;
 			}
-			return null;
+			return component as T;
 		}
 
 		public BaseComponent AddComponent(BaseComponent comp)
