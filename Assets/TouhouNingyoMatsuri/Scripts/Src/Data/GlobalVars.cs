@@ -21,9 +21,10 @@ namespace NingyoRi
 
 		#endregion
 
-		#region UI Path
+		#region Prefab Path
 
-		public static string uiCanvasPath = @"UI/UICanvas";
+		public const string uiCanvasPath = @"UI/UICanvas";
+		public const string entityPath = @"Entity/EntityRoot";
 
 		#endregion
 	}

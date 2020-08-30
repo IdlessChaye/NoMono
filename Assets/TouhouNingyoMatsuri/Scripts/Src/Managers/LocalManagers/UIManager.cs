@@ -7,7 +7,6 @@ namespace NingyoRi
 {
 	public partial class UIManager : BaseLocalManager
 	{
-		private GameObject _uiCanvasPrefab;
 		private Transform _uiCanvasRoot;
 		private Transform _pageContextRoot;
 		private Transform _widgetContextRoot;
@@ -15,9 +14,20 @@ namespace NingyoRi
 		private List<BaseContext> _contextList = new List<BaseContext>();
 		private List<BaseContext> _tickContextList = new List<BaseContext>();
 
+
+		private void ShowPages(Scene scene)
+		{
+			var sceneName = scene.name;
+			if (sceneName.Equals("Menu"))
+			{
+				Miscs.GetUIManager().ShowPage(new MainMenuPageContext());
+			}
+		}
+
+
 		public override void Init()
 		{
-			_uiCanvasPrefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.uiCanvasPath);
+			var _uiCanvasPrefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.uiCanvasPath);
 			if (_uiCanvasPrefab == null)
 				throw new System.Exception("UIManager Init");
 
@@ -79,13 +89,9 @@ namespace NingyoRi
 			}
 		}
 
-
 		public override void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
-			if (scene.name.Equals("Menu"))
-			{
-				Miscs.GetUIManager().ShowPage(new MainMenuPageContext());
-			}
+			ShowPages(scene);
 		}
 
 		public override void OnLevelUnLoaded(Scene scene)

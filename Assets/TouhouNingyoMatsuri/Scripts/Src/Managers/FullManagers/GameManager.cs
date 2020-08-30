@@ -29,16 +29,18 @@ namespace NingyoRi
 			AddGlobalManager(new InputManager());
 		}
 
-		private void AddLocalManagers(string sceneName)
+		private void AddLocalManagers(Scene scene)
 		{
+			var sceneName = scene.name;
 			if (sceneName.Equals("Menu"))
 			{
+				AddLocalManager(new EntityManager());
 				AddLocalManager(new UIManager());
 			}
 			else if (sceneName.Equals("MainLevel"))
 			{
-				AddLocalManager(new UIManager());
 				AddLocalManager(new EntityManager());
+				AddLocalManager(new UIManager());
 			}
 		}
 
@@ -164,7 +166,7 @@ namespace NingyoRi
 
 		private void OnLocalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
-			AddLocalManagers(scene.name);
+			AddLocalManagers(scene);
 
 			for (int i = _localManagerList.Count - 1; i >= 0; i--)
 			{

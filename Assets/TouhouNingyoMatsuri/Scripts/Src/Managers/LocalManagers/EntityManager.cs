@@ -7,21 +7,48 @@ namespace NingyoRi
 {
 	public partial class EntityManager : BaseLocalManager
 	{
+		private Transform _entityRoot;
+
 		private static uint entityId = 0;
 		private LinkedList<BaseEntity> _entityLinList = new LinkedList<BaseEntity>();
 		private LinkedList<BaseEntity> _tickEntityLinList = new LinkedList<BaseEntity>();
 		private Dictionary<uint, BaseEntity> _id2entityDict = new Dictionary<uint, BaseEntity>(8);
 
+		private void AddEntities(Scene scene)
+		{
+			var sceneName = scene.name;
+			if (sceneName.Equals("Menu"))
+			{
+				AddEntity(new AudioListenerEntity(null));
+			}
+			else if (sceneName.Equals("MainLevel"))
+			{
+				var playerSpawner = new PlayerSpawner();
+				AddEntity(playerSpawner);
+				AddEntity(new AudioListenerEntity(GetEntity(playerSpawner.playerId).GetGameObject().transform));
+			}
+		}
+
+
 		public override void Init()
 		{
-			entityId = 0;
+			SetNeedTick(true);
+
+			var prefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.entityPath);
+			if (prefab == null)
+				throw new System.Exception("EntityManager Init");
+
+			var _uiCanvasGO = GameObject.Find("EntityRoot");
+			_entityRoot = _uiCanvasGO != null ? _uiCanvasGO.transform : null;
+			if (_entityRoot == null)
+				_entityRoot = GameObject.Instantiate(prefab).transform;
 		}
 
 		public void AddEntity(BaseEntity entity)
 		{
 			if (entity == null)
 				return;
-			entity.Create(entityId++);
+			entity.Create(entityId++, _entityRoot);
 			_entityLinList.AddLast(entity);
 			if (entity.needTick)
 				_tickEntityLinList.AddLast(entity);
@@ -60,10 +87,7 @@ namespace NingyoRi
 
 		public override void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
-			if (scene.name.Equals(""))
-			{
-				
-			}
+			AddEntities(scene);
 		}
 
 		public override void OnLevelUnLoaded(Scene scene)
@@ -83,6 +107,7 @@ namespace NingyoRi
 
 		public override void Destroy()
 		{
+			entityId = 0;
 			_tickEntityLinList.Clear();
 			var node = _entityLinList.First;
 			BaseEntity value = null;

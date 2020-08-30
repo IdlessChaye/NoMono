@@ -7,7 +7,7 @@ namespace NingyoRi
 	{
 		public abstract ManagerType managerType { get; }
 
-		public bool needTick { get; set; }
+		public bool needTick { get;	private set; }
 
 		public virtual void Init() { }
 
@@ -28,6 +28,11 @@ namespace NingyoRi
 		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
 
 		public virtual void OnLevelUnLoaded(Scene scene) { }
+
+		public void SetNeedTick(bool needTick)
+		{
+			this.needTick = needTick;
+		}
 
 	}
 
