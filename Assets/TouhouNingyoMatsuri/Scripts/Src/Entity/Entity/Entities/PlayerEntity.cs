@@ -8,7 +8,7 @@ namespace NingyoRi
 	{
 		protected override void Init()
 		{
-			_prefabPath = @"Entity/Players/Alice";
+			_prefabPath = @"Entity/Player/Player";
 			SetNeedTick(true);
 		}
 

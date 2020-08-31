@@ -38,14 +38,42 @@ namespace NingyoRi
 		static int jumpState = Animator.StringToHash("Base Layer.Jump");
 		static int restState = Animator.StringToHash("Base Layer.Rest");
 
+		private new PlayerPlugin _plugin;
 		private Transform _transform;
 
 		public override void Init(BaseEntity entity)
 		{
 			base.Init(entity);
 			SetNeedTick(true);
+			_plugin = base._plugin as PlayerPlugin;
 
-			var go = entity.GetGameObject();
+			InitCharacter(0);
+		}
+
+		public void InitCharacter(int index)
+		{
+			GameObject go = null;
+			if (index == 0)
+			{
+				go = _plugin.alice;
+				Utils.TrySetActive(_plugin.alice, true);
+				Utils.TrySetActive(_plugin.marisa, false);
+				Utils.TrySetActive(_plugin.reimu, false);
+			}
+			else if (index == 1)
+			{
+				go = _plugin.marisa;
+				Utils.TrySetActive(_plugin.alice, false);
+				Utils.TrySetActive(_plugin.marisa, true);
+				Utils.TrySetActive(_plugin.reimu, false);
+			}
+			else if (index == 2)
+			{
+				go = _plugin.reimu;
+				Utils.TrySetActive(_plugin.alice, false);
+				Utils.TrySetActive(_plugin.marisa, false);
+				Utils.TrySetActive(_plugin.reimu, true);
+			}
 			anim = go.GetComponent<Animator>();
 			col = go.GetComponent<CapsuleCollider>();
 			rb = go.GetComponent<Rigidbody>();
@@ -54,6 +82,18 @@ namespace NingyoRi
 			// CapsuleColliderコンポーネントのHeight、Centerの初期値を保存する
 			orgColHight = col.height;
 			orgVectColCenter = col.center;
+
+			Messenger.Broadcast<Transform>((uint)EventType.ChangeAvatar, _transform);
+		}
+
+		public override void Tick1()
+		{
+			if (Input.GetKeyDown(KeyCode.Alpha1))
+				InitCharacter(0);
+			else if (Input.GetKeyDown(KeyCode.Alpha2))
+				InitCharacter(1);
+			else if (Input.GetKeyDown(KeyCode.Alpha3))
+				InitCharacter(2);
 		}
 
 		// 以下、メイン処理.リジッドボディと絡めるので、FixedUpdate内で処理を行う.

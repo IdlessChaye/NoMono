@@ -26,5 +26,7 @@ namespace NingyoRi
 			var vcCamera = camEntity.GetComponent<VCThirdPersonCamera>(ComponentType.VCThirdPersonCamera);
 			vcCamera.targetTF = player.GetGameObject().transform;
 		}
+
+		
 	}
 }

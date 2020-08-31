@@ -7,6 +7,8 @@ namespace NingyoRi
 	public enum EventType
 	{
 		GameStart,
+		ChangeAvatar,
+
 		None
 	}
 }

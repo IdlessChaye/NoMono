@@ -11,13 +11,13 @@ namespace NingyoRi
 		public bool isEnable { get; private set; }
 
 		protected BaseEntity _entity { get; private set; }
-		protected BaseMonoPlugin _plguin { get; private set; }
+		protected BaseMonoPlugin _plugin { get; private set; }
 		protected GameObject _gameObject { get; private set; }
 
 		public virtual void Init(BaseEntity entity)
 		{
 			this._entity = entity;
-			this._plguin = entity.GetPlugin();
+			this._plugin = entity.GetPlugin();
 			this._gameObject = entity.GetGameObject();
 			SetEnable(true);
 		}
@@ -61,7 +61,7 @@ namespace NingyoRi
 
 		public BaseMonoPlugin GetPlugin()
 		{
-			return _plguin;
+			return _plugin;
 		}
 
 	}

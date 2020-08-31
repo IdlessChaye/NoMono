@@ -68,6 +68,36 @@ namespace NingyoRi
 
 		#region Tick Entities
 
+		public override void Tick0()
+		{
+			var node = _tickEntityLinList.First;
+			BaseEntity value = null;
+			while (node != null)
+			{
+				value = node.Value;
+				node = node.Next;
+				if (value != null && value.needTick && value.isActive)
+				{
+					value.Tick0();
+				}
+			}
+		}
+
+		public override void Tick1()
+		{
+			var node = _tickEntityLinList.First;
+			BaseEntity value = null;
+			while (node != null)
+			{
+				value = node.Value;
+				node = node.Next;
+				if (value != null && value.needTick && value.isActive)
+				{
+					value.Tick1();
+				}
+			}
+		}
+
 		public override void Tick2()
 		{
 			var node = _tickEntityLinList.First;
@@ -79,6 +109,36 @@ namespace NingyoRi
 				if (value != null && value.needTick && value.isActive)
 				{
 					value.Tick2();
+				}
+			}
+		}
+
+		public override void Tick3()
+		{
+			var node = _tickEntityLinList.First;
+			BaseEntity value = null;
+			while (node != null)
+			{
+				value = node.Value;
+				node = node.Next;
+				if (value != null && value.needTick && value.isActive)
+				{
+					value.Tick3();
+				}
+			}
+		}
+
+		public override void Tick4()
+		{
+			var node = _tickEntityLinList.First;
+			BaseEntity value = null;
+			while (node != null)
+			{
+				value = node.Value;
+				node = node.Next;
+				if (value != null && value.needTick && value.isActive)
+				{
+					value.Tick4();
 				}
 			}
 		}

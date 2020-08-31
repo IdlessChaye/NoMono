@@ -18,8 +18,9 @@ namespace NingyoRi
 			SetNeedTick(true);
 
 			viewMoveSpeed = 0.03f;
-
 			_transform = _gameObject.transform;
+
+			Messenger.AddListener<Transform>((uint)EventType.ChangeAvatar, (t) => targetTF = t);
 		}
 
 		public override void Tick2()  // このカメラ切り替えはFixedUpdate()内でないと正常に動かない

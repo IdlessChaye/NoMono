@@ -6,6 +6,9 @@ namespace NingyoRi
 {
 	public static class Miscs
 	{
+
+
+
 		#region Manager Getter
 
 		public static string TextMapGet(string key)
