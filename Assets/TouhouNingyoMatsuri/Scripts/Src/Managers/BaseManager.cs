@@ -11,6 +11,7 @@ namespace NingyoRi
 
 		public virtual void Init() { }
 
+		public virtual void Setup() { }
 
 		public virtual void Tick0() { }
 

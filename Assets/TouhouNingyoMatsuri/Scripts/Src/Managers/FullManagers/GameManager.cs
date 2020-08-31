@@ -7,17 +7,18 @@ namespace NingyoRi
 {
 	public class GameManager : FullSingleton<GameManager>
 	{
-		private List<BaseGlobalManager> _globalManagerList = new List<BaseGlobalManager>(8);
-		private List<BaseLocalManager> _localManagerList = new List<BaseLocalManager>(8);
 		private Dictionary<uint, BaseManager> _managerDict = new Dictionary<uint, BaseManager>(16);
 
-		private List<BaseGlobalManager> _tickGlobalManagerList = new List<BaseGlobalManager>(4);
-		private List<BaseLocalManager> _tickLocalManagerList = new List<BaseLocalManager>(4);
+		private LinkedList<BaseGlobalManager> _globalManagerLinList = new LinkedList<BaseGlobalManager>();
+		private LinkedList<BaseLocalManager> _localManagerLinList = new LinkedList<BaseLocalManager>();
 
+		private LinkedList<BaseGlobalManager> _tickGlobalManagerLinList = new LinkedList<BaseGlobalManager>();
+		private LinkedList<BaseLocalManager> _tickLocalManagerLinList = new LinkedList<BaseLocalManager>();
 
+		private LinkedList<BaseGlobalManager> _toBeAddedTickGlobalManagers = new LinkedList<BaseGlobalManager>(); // 在Tick中或开始时添加的Manager，需要在帧末尾添加到Tick队列
+		private LinkedList<BaseLocalManager> _toBeAddedTickLocalManagers = new LinkedList<BaseLocalManager>(); // 初始化是在Add的那个帧时候完成，但Tick是在下个帧
 		private void AddFullManagers()
 		{
-			GameManager.Instance.Init();
 			FullCoroutineManager.Instance.Init();
 			FullMusicManager.Instance.Init();
 		}
@@ -50,51 +51,150 @@ namespace NingyoRi
 			FullCoroutineManager.Instance.Destroy();
 		}
 
-
 		public override void Awake()
 		{
 			base.Awake();
-			AddFullManagers();
 
-			Messenger.Broadcast((uint)EventType.GameStart);
+			SceneManager.sceneLoaded += OnSceneLoaded;
+			SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+			GameManager.Instance.Init();
+			GameManager.Instance.Setup();
 		}
 
 		public override void Init()
 		{
-			AddGlobalManagers();
-
-			SceneManager.sceneLoaded += OnSceneLoaded;
-			SceneManager.sceneUnloaded += OnSceneUnloaded;
+			AddGlobalManagers(); // 下一级的(GlobalManager\LocalManager)放在Init中增删
 		}
 
-		private void AddGlobalManager(BaseGlobalManager manager)
+		public override void Setup()
+		{
+			AddFullManagers(); // 同级的(FullManager)放在Setup中增删
+
+			Messenger.Broadcast((uint)EventType.GameStart);
+		}
+
+		#region On Scene Change
+
+		private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		{
+			OnGlobalManagerLoaded(scene, loadSceneMode);
+			OnLocalManagerLoaded(scene, loadSceneMode);
+		}
+
+		private void OnSceneUnloaded(Scene scene)
+		{
+			OnGlobalManagerUnloaded(scene);
+			OnLocalManagerUnloaded(scene);
+		}
+
+		private void OnGlobalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		{
+			var node = _globalManagerLinList.First;
+			BaseGlobalManager manager = null;
+			while (node != null)
+			{
+				manager = node.Value;
+				if (manager != null)
+				{
+					manager.OnLevelLoaded(scene, loadSceneMode);
+				}
+				node = node.Next;
+			}
+		}
+
+		private void OnLocalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
+		{
+			AddLocalManagers(scene);
+
+			var node = _localManagerLinList.First;
+			BaseLocalManager manager = null;
+			while(node != null)
+			{
+				manager = node.Value;
+				if (manager != null)
+				{
+					manager.OnLevelLoaded(scene, loadSceneMode);
+				}
+				node = node.Next;
+			}
+		}
+
+		private void OnGlobalManagerUnloaded(Scene scene)
+		{
+			var node = _globalManagerLinList.First;
+			BaseGlobalManager manager = null;
+			while (node != null)
+			{
+				manager = node.Value;
+				if (manager != null)
+				{
+					manager.OnLevelUnLoaded(scene);
+				}
+				node = node.Next;
+			}
+		}
+
+		private void OnLocalManagerUnloaded(Scene scene)
+		{
+			var node = _localManagerLinList.Last;
+			BaseLocalManager manager = null;
+			while (node != null)
+			{
+				manager = node.Value;
+				if (manager != null)
+				{
+					manager.OnLevelUnLoaded(scene);
+				}
+				node = node.Previous;
+			}
+
+			node = _localManagerLinList.Last;
+			manager = null;
+			while (node != null)
+			{
+				manager = node.Value;
+				if (manager != null)
+				{
+					manager.Destroy();
+					_managerDict.Remove((uint)manager.managerType);
+				}
+				node = node.Previous;
+			}
+
+			_localManagerLinList.Clear();
+			_tickLocalManagerLinList.Clear();
+			_toBeAddedTickLocalManagers.Clear();
+		}
+
+		#endregion
+
+		public void AddGlobalManager(BaseGlobalManager manager)
 		{
 			if (manager == null)
-				return;
-			if (_globalManagerList.Contains(manager))
 				return;
 			if (_managerDict.ContainsKey((uint)manager.managerType))
 				return;
 			manager.Init();
-			_globalManagerList.Add(manager);
+			_globalManagerLinList.AddLast(manager);
 			if (manager.needTick)
-				_tickGlobalManagerList.Add(manager);
+				_toBeAddedTickGlobalManagers.AddLast(manager);
 			_managerDict.Add((uint)manager.managerType, manager);
+			manager.Setup();
 		}
 
-		private void AddLocalManager(BaseLocalManager manager)
+		public void AddLocalManager(BaseLocalManager manager)
 		{
 			if (manager == null)
-				return;
-			if (_localManagerList.Contains(manager))
 				return;
 			if (_managerDict.ContainsKey((uint)manager.managerType))
 				return;
 			manager.Init();
-			_localManagerList.Add(manager);
+			_localManagerLinList.AddLast(manager);
 			if (manager.needTick)
-				_tickLocalManagerList.Add(manager);
+				_toBeAddedTickLocalManagers.AddLast(manager);
 			_managerDict.Add((uint)manager.managerType, manager);
+			manager.Setup();
 		}
 
 		public T GetManager<T>(ManagerType type) where T: class
@@ -114,177 +214,223 @@ namespace NingyoRi
 
 		public override void Destroy()
 		{
-			for (int i = _localManagerList.Count - 1; i >= 0; i--)
+			var node = _localManagerLinList.Last;
+			BaseLocalManager manager = null;
+			while (node != null)
 			{
-				var manager = _localManagerList[i];
+				manager = node.Value;
 				if (manager != null)
 				{
 					manager.Destroy();
 					_managerDict.Remove((uint)manager.managerType);
 				}
+				node = node.Previous;
 			}
 
-			_localManagerList.Clear();
-			_tickLocalManagerList.Clear();
+			_localManagerLinList.Clear();
+			_tickLocalManagerLinList.Clear();
+			_toBeAddedTickLocalManagers.Clear();
 
-			for (int i = _globalManagerList.Count - 1; i >= 0; i--)
+			var nodee = _globalManagerLinList.Last;
+			BaseGlobalManager managerr = null;
+			while (nodee != null)
 			{
-				var manager = _globalManagerList[i];
-				if (manager != null)
+				managerr = nodee.Value;
+				if (managerr != null)
 				{
-					manager.Destroy();
-					_managerDict.Remove((uint)manager.managerType);
+					managerr.Destroy();
+					_managerDict.Remove((uint)managerr.managerType);
 				}
+				nodee = nodee.Previous;
 			}
 
-			_globalManagerList.Clear();
-			_tickGlobalManagerList.Clear();
+			_globalManagerLinList.Clear();
+			_tickGlobalManagerLinList.Clear();
+			_toBeAddedTickGlobalManagers.Clear();
 
 			_managerDict.Clear();
 
 			UnityEngine.Application.Quit();
 		}
 
-		#region On Scene Change
-
-		private void OnSceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
-		{
-			OnGlobalManagerLoaded(scene, loadSceneMode);
-			OnLocalManagerLoaded(scene, loadSceneMode);
-		}
-
-		private void OnSceneUnloaded(Scene scene)
-		{
-			OnGlobalManagerUnloaded(scene);
-			OnLocalManagerUnloaded(scene);
-		}
-
-		private void OnGlobalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
-		{
-
-		}
-
-		private void OnLocalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
-		{
-			AddLocalManagers(scene);
-
-			for (int i = _localManagerList.Count - 1; i >= 0; i--)
-			{
-				BaseLocalManager manager = _localManagerList[i];
-				if (manager != null)
-					manager.OnLevelLoaded(scene, loadSceneMode);
-			}
-		}
-
-		private void OnGlobalManagerUnloaded(Scene scene)
-		{
-
-		}
-
-		private void OnLocalManagerUnloaded(Scene scene)
-		{
-			for (int i = _localManagerList.Count - 1; i >= 0; i--)
-			{
-				var manager = _localManagerList[i];
-				if (manager != null)
-					manager.OnLevelUnLoaded(scene);
-			}
-
-			for (int i = _localManagerList.Count - 1; i >= 0; i--)
-			{
-				var manager = _localManagerList[i];
-				if (manager != null)
-				{
-					manager.Destroy();
-					_managerDict.Remove((uint)manager.managerType);
-				}
-			}
-
-			_localManagerList.Clear();
-			_tickLocalManagerList.Clear();
-		}
-
-		#endregion
 
 		private void Update()
 		{
 			#region Tick Global Manager
 
-			for (int i = _tickGlobalManagerList.Count - 1; i >= 0; i--)
+			var nodeGlobal = _tickGlobalManagerLinList.First;
+			BaseGlobalManager managerGlobal = null;
+			while (nodeGlobal != null)
 			{
-				BaseManager manager = _tickGlobalManagerList[i];
-				if (manager != null)
-					manager.Tick0();
+				managerGlobal = nodeGlobal.Value;
+				if (managerGlobal != null && managerGlobal.needTick) // manager 的 isActive 一直都是 true，如果不是，则不是Manager，而是 Entity
+				{
+					managerGlobal.Tick0();
+				}
+				nodeGlobal = nodeGlobal.Next;
 			}
 
-			for (int i = _tickGlobalManagerList.Count - 1; i >= 0; i--)
+			nodeGlobal = _tickGlobalManagerLinList.First;
+			managerGlobal = null;
+			while(nodeGlobal != null)
 			{
-				BaseManager manager = _tickGlobalManagerList[i];
-				if (manager != null)
-					manager.Tick1();
+				managerGlobal = nodeGlobal.Value;
+				if (managerGlobal != null && managerGlobal.needTick)
+				{
+					managerGlobal.Tick1();
+				}
+				nodeGlobal = nodeGlobal.Next;
 			}
 
-			for (int i = _tickGlobalManagerList.Count - 1; i >= 0; i--)
+			nodeGlobal = _tickGlobalManagerLinList.First;
+			managerGlobal = null;
+			while (nodeGlobal != null)
 			{
-				BaseManager manager = _tickGlobalManagerList[i];
-				if (manager != null)
-					manager.Tick2();
+				managerGlobal = nodeGlobal.Value;
+				if (managerGlobal != null && managerGlobal.needTick)
+				{
+					managerGlobal.Tick2();
+				}
+				nodeGlobal = nodeGlobal.Next;
 			}
 
-			for (int i = _tickGlobalManagerList.Count - 1; i >= 0; i--)
+			nodeGlobal = _tickGlobalManagerLinList.First;
+			managerGlobal = null;
+			while (nodeGlobal != null)
 			{
-				BaseManager manager = _tickGlobalManagerList[i];
-				if (manager != null)
-					manager.Tick3();
+				managerGlobal = nodeGlobal.Value;
+				if (managerGlobal != null && managerGlobal.needTick)
+				{
+					managerGlobal.Tick3();
+				}
+				nodeGlobal = nodeGlobal.Next;
 			}
 
-			for (int i = _tickGlobalManagerList.Count - 1; i >= 0; i--)
+			nodeGlobal = _tickGlobalManagerLinList.First;
+			managerGlobal = null;
+			while (nodeGlobal != null)
 			{
-				BaseManager manager = _tickGlobalManagerList[i];
-				if (manager != null)
-					manager.Tick4();
+				managerGlobal = nodeGlobal.Value;
+				if (managerGlobal != null && managerGlobal.needTick)
+				{
+					managerGlobal.Tick4();
+				}
+				nodeGlobal = nodeGlobal.Next;
 			}
 
 			#endregion
 
 			#region Tick Local Manager
 
-			for (int i = _tickLocalManagerList.Count - 1; i >= 0; i--)
+			var nodeLocal = _tickLocalManagerLinList.First;
+			BaseLocalManager managerLocal = null;
+			while (nodeLocal != null)
 			{
-				BaseManager manager = _tickLocalManagerList[i];
-				if (manager != null)
-					manager.Tick0();
+				managerLocal = nodeLocal.Value;
+				if (managerLocal != null && managerLocal.needTick) // manager 的 isActive 一直都是 true，如果不是，则不是Manager，而是 Entity
+				{
+					managerLocal.Tick0();
+				}
+				nodeLocal = nodeLocal.Next;
 			}
 
-			for (int i = _tickLocalManagerList.Count - 1; i >= 0; i--)
+			nodeLocal = _tickLocalManagerLinList.First;
+			managerLocal = null;
+			while(nodeLocal != null)
 			{
-				BaseManager manager = _tickLocalManagerList[i];
-				if (manager != null)
-					manager.Tick1();
+				managerLocal = nodeLocal.Value;
+				if (managerLocal != null && managerLocal.needTick)
+				{
+					managerLocal.Tick1();
+				}
+				nodeLocal = nodeLocal.Next;
 			}
 
-			for (int i = _tickLocalManagerList.Count - 1; i >= 0; i--)
+			nodeLocal = _tickLocalManagerLinList.First;
+			managerLocal = null;
+			while (nodeLocal != null)
 			{
-				BaseManager manager = _tickLocalManagerList[i];
-				if (manager != null)
-					manager.Tick2();
+				managerLocal = nodeLocal.Value;
+				if (managerLocal != null && managerLocal.needTick)
+				{
+					managerLocal.Tick2();
+				}
+				nodeLocal = nodeLocal.Next;
 			}
 
-			for (int i = _tickLocalManagerList.Count - 1; i >= 0; i--)
+			nodeLocal = _tickLocalManagerLinList.First;
+			managerLocal = null;
+			while (nodeLocal != null)
 			{
-				BaseManager manager = _tickLocalManagerList[i];
-				if (manager != null)
-					manager.Tick3();
+				managerLocal = nodeLocal.Value;
+				if (managerLocal != null && managerLocal.needTick)
+				{
+					managerLocal.Tick3();
+				}
+				nodeLocal = nodeLocal.Next;
 			}
 
-			for (int i = _tickLocalManagerList.Count - 1; i >= 0; i--)
+			nodeLocal = _tickLocalManagerLinList.First;
+			managerLocal = null;
+			while (nodeLocal != null)
 			{
-				BaseManager manager = _tickLocalManagerList[i];
-				if (manager != null)
-					manager.Tick4();
+				managerLocal = nodeLocal.Value;
+				if (managerLocal != null && managerLocal.needTick)
+				{
+					managerLocal.Tick4();
+				}
+				nodeLocal = nodeLocal.Next;
 			}
 
 			#endregion
 		}
+
+		private void LateUpdate()
+		{
+			AddToTick();
+		}
+
+		#region Add To Tick LinkedList
+		private void AddToTick()
+		{
+			AddToTickGlobal();
+			AddToTickLocal();
+		}
+		private void AddToTickGlobal()
+		{
+			var node = _toBeAddedTickGlobalManagers.First;
+			BaseGlobalManager manager = null;
+			while(node != null)
+			{
+				manager = node.Value;
+				if (manager != null && manager.needTick)
+				{
+					_tickGlobalManagerLinList.AddLast(manager);
+				}
+				node = node.Next;
+			}
+
+			_toBeAddedTickGlobalManagers.Clear();
+		}
+
+		private void AddToTickLocal()
+		{
+			var node = _toBeAddedTickLocalManagers.First;
+			BaseLocalManager manager = null;
+			while (node != null)
+			{
+				manager = node.Value;
+				if (manager != null && manager.needTick)
+				{
+					_tickLocalManagerLinList.AddLast(manager);
+				}
+				node = node.Next;
+			}
+
+			_toBeAddedTickLocalManagers.Clear();
+		}
+
+		#endregion
+
 	}
 }
