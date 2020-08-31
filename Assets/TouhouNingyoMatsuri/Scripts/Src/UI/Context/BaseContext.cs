@@ -17,7 +17,7 @@ namespace NingyoRi
 
 		private List<UnityEvent> _unityEventList;
 
-		public void Show(Transform pageContextRoot)
+		public void Load(Transform pageContextRoot)
 		{
 			Init();
 
@@ -32,30 +32,21 @@ namespace NingyoRi
 			if (_monoContext == null)
 				throw new System.Exception("UIManager ShowPage No BaseMonoPageContext.");
 			_monoContext.Init(this);
-			_monoContext.Show();
-			Setup();
-			FullCoroutineManager.Instance.AddCoroutine(0.5f, () => {
-				SetupCallbacks();
-				SetupEvents();
-				});
 		}
 
-		public void Close()
-		{
-			Clear();
-			_monoContext.Hide();
-			FullCoroutineManager.Instance.AddCoroutine(0.5f, () => {
-				Destroy();
-			});
-		}
-
-		protected abstract void Init();
-
-		protected virtual void Setup()
+		public virtual void Setup()
 		{
 			if (_unityEventList == null)
 				_unityEventList = new List<UnityEvent>(4);
+
+			_monoContext.Show();
+			FullCoroutineManager.Instance.AddCoroutine(0.5f, () => { // 注意：这0.5s之内Context接收不到Callback，先这样，以后也许会有Bug
+				SetupCallbacks();
+				SetupEvents();
+			});
 		}
+
+		protected abstract void Init(); // 设置 _prefabPath
 
 		protected virtual void SetupCallbacks()
 		{
@@ -67,21 +58,41 @@ namespace NingyoRi
 
 		}
 
-		public virtual void Tick() { }
+		public virtual void Tick2(float deltaTime) { }
 
-		public virtual void Clear()
+		public void Close()
+		{
+			Clear();
+			_monoContext.Hide();
+			FullCoroutineManager.Instance.AddCoroutine(0.5f, () => {
+				Destroy();
+			});
+		}
+
+		protected virtual void Clear()
 		{
 			ClearAllUnityEvents();
 			_unityEventList = null;
 			needTick = false;
 		}
 
-		public virtual void Destroy()
+		protected virtual void Destroy()
 		{
 			if (_monoContext != null)
 			{
 				GameObject.Destroy(_monoContext.gameObjectContext);
 			}
+		}
+
+		private void ClearAllUnityEvents()
+		{
+			if (_unityEventList == null)
+				return;
+			foreach (var unityEvent in _unityEventList)
+			{
+				unityEvent.RemoveAllListeners();
+			}
+			_unityEventList.Clear();
 		}
 
 		protected void BindCallback(Button button, UnityAction action)
@@ -92,15 +103,5 @@ namespace NingyoRi
 			button.onClick.AddListener(action);
 		}
 
-		private void ClearAllUnityEvents()
-		{
-			if (_unityEventList == null)
-				return;
-			foreach(var unityEvent in _unityEventList)
-			{
-				unityEvent.RemoveAllListeners();
-			}
-			_unityEventList.Clear();
-		}
 	}
 }

@@ -23,7 +23,7 @@ namespace NingyoRi
 			Messenger.AddListener<Transform>((uint)EventType.ChangeAvatar, (t) => targetTF = t);
 		}
 
-		public override void Tick2()  // このカメラ切り替えはFixedUpdate()内でないと正常に動かない
+		public override void Tick2(float deltaTime)  // このカメラ切り替えはFixedUpdate()内でないと正常に動かない
 		{
 			if (targetTF == null)
 				return;

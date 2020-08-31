@@ -17,7 +17,7 @@ namespace NingyoRi
 			_prefabPath = @"Entity/AudioListener";
 		}
 
-		protected override void Setup()
+		public override void Setup()
 		{
 			if (_targetTF != null)
 				GetGameObject().transform.SetParent(_targetTF, false);

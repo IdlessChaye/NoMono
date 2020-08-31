@@ -16,11 +16,10 @@ namespace NingyoRi
 		protected GameObject _gameObject { get; private set; }
 		protected BaseMonoPlugin _monoPlugin { get; private set; }
 
+		private Dictionary<uint, BaseComponent> _type2compDict = new Dictionary<uint, BaseComponent>(8);
 		private LinkedList<BaseComponent> _compLinList = new LinkedList<BaseComponent>();
 		private LinkedList<BaseComponent> _tickCompLinList = new LinkedList<BaseComponent>();
-		private Dictionary<uint, BaseComponent> _type2compDict = new Dictionary<uint, BaseComponent>(8);
-
-		private LinkedList<BaseComponent> _destroyCompLinList;
+		private LinkedList<BaseComponent> _toBeAddedComps = new LinkedList<BaseComponent>();
 
 		public void Create(uint entityId, Transform entityRoot)
 		{
@@ -42,115 +41,160 @@ namespace NingyoRi
 				else
 					_monoPlugin.Init(this);
 			}
-
-			Setup();
-		}
-
-		public void Desert()
-		{
-			Clear();
-			Destroy();
 		}
 
 		protected abstract void Init(); // 这里负责设置 isActive _prefabPath 相关的代码
 
-		protected virtual void Setup()
+		public virtual void Setup() { } // 这里负责new Component(); AddComponent;
+
+		public void AddComponent(BaseComponent comp)
 		{
-			// 这里负责new Component 然后对 comp Init
-			// 之后才能AddComponent
+			if (comp == null)
+				return;
+
+			var typeId = (uint)comp.compType;
+			if (_type2compDict.ContainsKey(typeId))
+			{
+				Debug.LogError("还没想好要不要携带多个相同组件,目前不允许");
+				return;
+			}
+
+			comp.Init(this);
+
+			_toBeAddedComps.AddLast(comp);
 		}
 
-		public void Tick0()
+		public void RemoveComponent(ComponentType compType)
+		{
+			var typeId = (uint)compType;
+			if (_type2compDict.ContainsKey(typeId) == false)
+				return;
+
+			var comp = _type2compDict[typeId];
+			_type2compDict.Remove(typeId);
+			_tickCompLinList.Remove(comp);
+			_compLinList.Remove(comp);
+
+			comp.Clear();
+			comp.Destroy();
+		}
+
+		public void TickAddTo(float deltaTime)
+		{
+			LinkedListNode<BaseComponent> node = null;
+			BaseComponent comp = null;
+			if (_toBeAddedComps.Count != 0)
+			{
+				node = null;
+				comp = null;
+				while (node != null)
+				{
+					comp = node.Value;
+					if (comp != null)
+					{
+						_compLinList.AddLast(comp);
+						_type2compDict.Add((uint)comp.compType, comp);
+						if (comp.needTick && comp.isEnable)
+						{ 
+							_tickCompLinList.AddLast(comp);
+						}
+						comp.Setup();
+					}
+					node = node.Next;
+				}
+			}
+		}
+
+		#region Tick
+		public void Tick0(float deltaTime)
 		{
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Next;
 				if (value != null && value.needTick && value.isEnable)
 				{
-					value.Tick0();
+					value.Tick0(deltaTime);
 				}
+				node = node.Next;
 			}
 		}
 
-		public void Tick1()
+		public void Tick1(float deltaTime)
 		{
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Next;
 				if (value != null && value.needTick && value.isEnable)
 				{
-					value.Tick1();
+					value.Tick1(deltaTime);
 				}
+				node = node.Next;
 			}
 		}
 
-		public void Tick2()
+		public void Tick2(float deltaTime)
 		{
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Next;
 				if (value != null && value.needTick && value.isEnable)
 				{
-					value.Tick2();
+					value.Tick2(deltaTime);
 				}
+				node = node.Next;
 			}
 		}
 
-		public void Tick3()
+		public void Tick3(float deltaTime)
 		{
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Next;
 				if (value != null && value.needTick && value.isEnable)
 				{
-					value.Tick3();
+					value.Tick3(deltaTime);
 				}
+				node = node.Next;
 			}
 		}
 
-		public void Tick4()
+		public void Tick4(float deltaTime)
 		{
 			var node = _tickCompLinList.First;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Next;
 				if (value != null && value.needTick && value.isEnable)
 				{
-					value.Tick4();
+					value.Tick4(deltaTime);
 				}
+				node = node.Next;
 			}
 		}
+
+		#endregion
 
 		public virtual void Clear()
 		{
-			_destroyCompLinList = new LinkedList<BaseComponent>();
 			var node = _compLinList.Last;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Previous;
 				if (value != null)
 				{
-					value = RemoveComponent(value.compType);
-					if (value == null)
-						Debug.LogError("!");
-					_destroyCompLinList.AddLast(value);
+					value.Clear();
 				}
+				node = node.Previous;
 			}
 
 			SetActive(false);
@@ -158,19 +202,17 @@ namespace NingyoRi
 
 		public virtual void Destroy()
 		{
-			var node = _destroyCompLinList.First;
+			var node = _compLinList.Last;
 			BaseComponent value = null;
 			while (node != null)
 			{
 				value = node.Value;
-				node = node.Next;
 				if (value != null)
 				{
 					value.Destroy();
 				}
+				node = node.Previous;
 			}
-			_destroyCompLinList.Clear();
-			_destroyCompLinList = null;
 
 			if (_monoPlugin != null)
 			{
@@ -198,43 +240,6 @@ namespace NingyoRi
 			}
 			return component as T;
 		}
-
-		public BaseComponent AddComponent(BaseComponent comp)
-		{
-			if (comp == null)
-				return null;
-			comp.OnAdd();
-			var typeId = (uint)comp.compType;
-			if (_type2compDict.ContainsKey(typeId))
-			{
-				Debug.LogError("还没想好要不要携带多个相同组件,目前不允许");
-				return null;
-			}
-			_compLinList.AddLast(comp);
-			if (comp.needTick)
-				_tickCompLinList.AddLast(comp);
-			_type2compDict.Add(typeId, comp);
-			comp.OnAdded();
-			return comp;
-		}
-
-		public BaseComponent RemoveComponent(ComponentType compType)
-		{
-			var typeId = (uint)compType;
-			if (_type2compDict.ContainsKey(typeId) == false)
-			{
-				return null;
-			}
-			var comp = _type2compDict[typeId];
-			comp.OnRemove();
-			_type2compDict.Remove(typeId);
-			if (_tickCompLinList.Contains(comp))
-				_tickCompLinList.Remove(comp);
-			_compLinList.Remove(comp);
-			comp.OnRemoved();
-			return comp;
-		}
-
 		public BaseMonoPlugin GetPlugin()
 		{
 			return _monoPlugin;

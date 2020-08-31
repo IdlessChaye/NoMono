@@ -50,6 +50,11 @@ namespace NingyoRi
 			InitCharacter(0);
 		}
 
+		public override void Setup()
+		{
+			Messenger.Broadcast<Transform>((uint)EventType.ChangeAvatar, _transform);
+		}
+
 		public void InitCharacter(int index)
 		{
 			GameObject go = null;
@@ -86,7 +91,7 @@ namespace NingyoRi
 			Messenger.Broadcast<Transform>((uint)EventType.ChangeAvatar, _transform);
 		}
 
-		public override void Tick1()
+		public override void Tick1(float deltaTime)
 		{
 			if (Input.GetKeyDown(KeyCode.Alpha1))
 				InitCharacter(0);
@@ -97,7 +102,7 @@ namespace NingyoRi
 		}
 
 		// 以下、メイン処理.リジッドボディと絡めるので、FixedUpdate内で処理を行う.
-		public override void Tick2()
+		public override void Tick2(float deltaTime)
 		{
 			float h = Input.GetAxis("Horizontal");              // 入力デバイスの水平軸をhで定義
 			float v = Input.GetAxis("Vertical");                // 入力デバイスの垂直軸をvで定義

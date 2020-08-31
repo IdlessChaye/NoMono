@@ -12,11 +12,9 @@ namespace NingyoRi
 			SetNeedTick(true);
 		}
 
-		protected override void Setup()
+		public override void Setup()
 		{
-			var rawPlayerCtrl = new LCRawPlayerController();
-			rawPlayerCtrl.Init(this);
-			AddComponent(rawPlayerCtrl);
+			AddComponent(new LCRawPlayerController());
 		}
 	}
 }

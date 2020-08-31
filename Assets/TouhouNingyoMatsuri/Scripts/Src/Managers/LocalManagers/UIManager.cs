@@ -11,9 +11,11 @@ namespace NingyoRi
 		private Transform _pageContextRoot;
 		private Transform _widgetContextRoot;
 
-		private List<BaseContext> _contextList = new List<BaseContext>();
-		private List<BaseContext> _tickContextList = new List<BaseContext>();
+		//private Dictionary<uint, BaseContext> _contextDict = new Dictionary<uint, BaseContext>(4);
 
+		private LinkedList<BaseContext> _contextLinList = new LinkedList<BaseContext>();
+		private LinkedList<BaseContext> _tickContextLinList = new LinkedList<BaseContext>();
+		private LinkedList<BaseContext> _toBeAddedContexts = new LinkedList<BaseContext>();
 
 		private void ShowPages(Scene scene)
 		{
@@ -23,8 +25,6 @@ namespace NingyoRi
 				Miscs.GetUIManager().ShowPage(new MainMenuPageContext());
 			}
 		}
-
-
 		public override void Init()
 		{
 			var _uiCanvasPrefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.uiCanvasPath);
@@ -37,55 +37,84 @@ namespace NingyoRi
 				_uiCanvasRoot = GameObject.Instantiate(_uiCanvasPrefab).transform;
 			_pageContextRoot = _uiCanvasRoot.Find(@"Contexts/Pages");
 			_widgetContextRoot = _uiCanvasRoot.Find(@"Contexts/Widgets");
+
+			SetNeedTick(true);
 		}
 
 		public void ShowPage(BasePageContext context)
 		{
 			if (context == null)
 				return;
-			context.Show(_pageContextRoot);
-			_contextList.Add(context);
-			if (context.needTick)
-				_tickContextList.Add(context);
+			context.Load(_pageContextRoot);
+			_toBeAddedContexts.AddLast(context);
 		}
 
 		public void ShowWidget(BaseWidgetContext context)
 		{
 			if (context == null)
 				return;
-			context.Show(_widgetContextRoot);
-			_contextList.Add(context);
-			if (context.needTick)
-				_tickContextList.Add(context);
+			context.Load(_widgetContextRoot);
+			_toBeAddedContexts.AddLast(context);
 		}
 
 		public void ClosePage(BasePageContext context)
 		{
 			if (context == null)
 				return;
+			_tickContextLinList.Remove(context);
+			_contextLinList.Remove(context);
+			//_contextDict;
 			context.Close();
-			if (_tickContextList.Contains(context))
-				_tickContextList.Remove(context);
-			_contextList.Remove(context);
 		}
 
 		public void CloseWidget(BaseWidgetContext context)
 		{
 			if (context == null)
 				return;
+			_tickContextLinList.Remove(context);
+			_contextLinList.Remove(context);
+			//_contextDict;
 			context.Close();
-			if (_tickContextList.Contains(context))
-				_tickContextList.Remove(context);
-			_contextList.Remove(context);
 		}
 
-		public override void Tick2()
+		public override void Tick2(float deltaTime)
 		{
-			for (int i = 0; i < _tickContextList.Count; i++)
+			var node = _tickContextLinList.First;
+			BaseContext context = null;
+			while (node != null)
 			{
-				var context = _tickContextList[i];
+				context = node.Value;
 				if (context != null && context.needTick)
-					context.Tick();
+				{
+					context.Tick2(deltaTime);
+				}
+				node = node.Next;
+			}
+		}
+
+		public override void TickAddTo(float deltaTime)
+		{
+			if (_toBeAddedContexts.Count != 0)
+			{
+				var node = _toBeAddedContexts.First;
+				BaseContext context = null;
+				while (node != null)
+				{
+					context = node.Value;
+					if (context != null)
+					{
+						_contextLinList.AddLast(context);
+						//_contextDict.Add(context.);
+						if (context.needTick)
+						{ 
+							_tickContextLinList.AddLast(context);
+						}
+						context.Setup();
+					}
+					node = node.Next;
+				}
+
+				_toBeAddedContexts.Clear();
 			}
 		}
 
@@ -96,11 +125,21 @@ namespace NingyoRi
 
 		public override void OnLevelUnLoaded(Scene scene)
 		{
-			if (_contextList != null)
+			var node = _contextLinList.Last;
+			BaseContext context = null;
+			while (node != null)
 			{
-				foreach (var context in _contextList)
-					context.Clear();
+				context = node.Value;
+				if (context != null && context.needTick)
+				{
+					context.Close();
+				}
+				node = node.Previous;
 			}
+
+			_tickContextLinList.Clear();
+			_contextLinList.Clear();
+			// Dict
 		}
 
 		public override void Destroy()
@@ -108,13 +147,6 @@ namespace NingyoRi
 			_uiCanvasRoot = null;
 			_pageContextRoot = null;
 			_widgetContextRoot = null;
-			_tickContextList.Clear();
-			if (_contextList != null)
-			{ 
-				foreach (var context in _contextList)
-					context.Destroy();
-			}
-			_contextList.Clear();
 		}
 
 	}

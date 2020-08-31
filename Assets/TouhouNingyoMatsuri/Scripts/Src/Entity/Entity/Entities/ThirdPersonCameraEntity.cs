@@ -11,13 +11,12 @@ namespace NingyoRi
 		{
 			_prefabPath = @"Entity/ThirdCamera";
 			SetNeedTick(true);
+
 		}
 
-		protected override void Setup()
+		public override void Setup()
 		{
-			var vcCamera = new VCThirdPersonCamera();
-			vcCamera.Init(this);
-			AddComponent(vcCamera);
+			AddComponent(new VCThirdPersonCamera());
 		}
 	}
 }

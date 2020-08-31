@@ -19,7 +19,7 @@ namespace NingyoRi
 			
 		}
 
-		public override void Tick2()
+		public override void Tick2(float deltaTime)
 		{
 			if (Input.GetKey(KeyCode.A))
 			{

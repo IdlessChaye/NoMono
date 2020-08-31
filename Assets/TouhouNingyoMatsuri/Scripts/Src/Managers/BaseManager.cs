@@ -13,22 +13,23 @@ namespace NingyoRi
 
 		public virtual void Setup() { }
 
-		public virtual void Tick0() { }
+		public virtual void Tick0(float deltaTime) { }
 
-		public virtual void Tick1() { }
+		public virtual void Tick1(float deltaTime) { }
 
-		public virtual void Tick2() { }
+		public virtual void Tick2(float deltaTime) { }
 
-		public virtual void Tick3() { }
+		public virtual void Tick3(float deltaTime) { }
 
-		public virtual void Tick4() { }
+		public virtual void Tick4(float deltaTime) { }
 
-
-		public virtual void Destroy() { }
+		public virtual void TickAddTo(float deltaTime) { }
 
 		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
 
-		public virtual void OnLevelUnLoaded(Scene scene) { }
+		public virtual void OnLevelUnLoaded(Scene scene) { } // 相当于Clear，在逻辑上的Destroy
+
+		public virtual void Destroy() { }
 
 		public void SetNeedTick(bool needTick)
 		{
