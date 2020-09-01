@@ -6,6 +6,8 @@ namespace NingyoRi
 {
 	public partial class AudioListenerEntity : BaseEntity
 	{
+		protected override string _prefabPath { get { return @"Entity/AudioListener"; } }
+
 		private Transform _targetTF;
 		public AudioListenerEntity(Transform transform)
 		{
@@ -14,13 +16,13 @@ namespace NingyoRi
 
 		protected override void Init()
 		{
-			_prefabPath = @"Entity/AudioListener";
+			if (_targetTF != null)
+				GetGameObject().transform.SetParent(_targetTF, false);
 		}
 
 		public override void Setup()
 		{
-			if (_targetTF != null)
-				GetGameObject().transform.SetParent(_targetTF, false);
+			
 		}
 	}
 }

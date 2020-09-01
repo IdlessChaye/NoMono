@@ -46,13 +46,11 @@ namespace NingyoRi
 			base.Init(entity);
 			SetNeedTick(true);
 			_plugin = base._plugin as PlayerPlugin;
-
-			InitCharacter(0);
 		}
 
 		public override void Setup()
 		{
-			Messenger.Broadcast<Transform>((uint)EventType.ChangeAvatar, _transform);
+			InitCharacter(0);
 		}
 
 		public void InitCharacter(int index)

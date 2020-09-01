@@ -6,6 +6,8 @@ namespace NingyoRi
 {
 	public class GameManager : FullSingleton<GameManager>
 	{
+		public static bool isDirtyAdd { get; set; }
+
 		private Dictionary<uint, BaseManager> _managerDict = new Dictionary<uint, BaseManager>(16);
 
 		private LinkedList<BaseGlobalManager> _globalManagerLinList = new LinkedList<BaseGlobalManager>();
@@ -14,8 +16,8 @@ namespace NingyoRi
 		private LinkedList<BaseGlobalManager> _tickGlobalManagerLinList = new LinkedList<BaseGlobalManager>();
 		private LinkedList<BaseLocalManager> _tickLocalManagerLinList = new LinkedList<BaseLocalManager>();
 
-		private LinkedList<BaseGlobalManager> _toBeAddedGlobalManagers = new LinkedList<BaseGlobalManager>(); // 在Tick中或开始时添加的Manager，需要在帧末尾添加到Tick队列
-		private LinkedList<BaseLocalManager> _toBeAddedLocalManagers = new LinkedList<BaseLocalManager>(); // 初始化是在Add的那个帧时候完成，但Tick是在下个帧
+		private List<BaseGlobalManager> _toBeAddedGlobalList = new List<BaseGlobalManager>(); // 初始化是在Add的那个帧时候完成，但Tick是在下个帧
+		private List<BaseLocalManager> _toBeAddedLocalList = new List<BaseLocalManager>();  // _toBeAdded的目的是动态添加，双层分离初始化(Init\Setup)
 		private void AddFullManagers()
 		{
 			FullCoroutineManager.Instance.Init();
@@ -27,6 +29,12 @@ namespace NingyoRi
 			AddGlobalManager(new ResourceManager());
 			AddGlobalManager(new TextMapManager());
 			AddGlobalManager(new InputManager());
+		}
+
+		private void RemoveFullManagers()
+		{
+			FullMusicManager.Instance.Destroy();
+			FullCoroutineManager.Instance.Destroy();
 		}
 
 		private void AddLocalManagers(Scene scene)
@@ -44,12 +52,6 @@ namespace NingyoRi
 			}
 		}
 
-		private void RemoveFullManagers()
-		{
-			FullMusicManager.Instance.Destroy();
-			FullCoroutineManager.Instance.Destroy();
-		}
-
 		public override void Awake()
 		{
 			base.Awake();
@@ -58,21 +60,13 @@ namespace NingyoRi
 			SceneManager.sceneUnloaded += OnSceneUnloaded;
 
 			GameManager.Instance.Init();
-			GameManager.Instance.Setup();
 		}
 
 		public override void Init()
 		{
 			AddGlobalManagers(); // 下一级的(GlobalManager\LocalManager)放在Init中增删
 
-			AddToGlobal(); // 因为只有一处会 AddGlobalManager 所以AddTo放到这里执行一次即可
-		}
-
-		public override void Setup()
-		{
-			AddFullManagers(); // 同级的(FullManager)放在Setup中增删
-
-			//Messenger.Broadcast((uint)EventType.GameStart); // Test
+			AddFullManagers();
 		}
 
 		#region On Scene Change
@@ -81,12 +75,6 @@ namespace NingyoRi
 		{
 			OnGlobalManagerLoaded(scene, loadSceneMode);
 			OnLocalManagerLoaded(scene, loadSceneMode);
-		}
-
-		private void OnSceneUnloaded(Scene scene)
-		{
-			OnGlobalManagerUnloaded(scene);
-			OnLocalManagerUnloaded(scene);
 		}
 
 		private void OnGlobalManagerLoaded(Scene scene, LoadSceneMode loadSceneMode)
@@ -108,11 +96,38 @@ namespace NingyoRi
 		{
 			AddLocalManagers(scene);
 
-			AddToLocal();
+			if (_toBeAddedLocalList.Count != 0)
+			{
+				BaseLocalManager managerLocal = null;
+				var eLocal = _toBeAddedLocalList.GetEnumerator();
+				while (eLocal.MoveNext())
+				{
+					managerLocal = eLocal.Current;
+					if (managerLocal != null)
+					{
+						managerLocal.TickAddTo();
+
+						_localManagerLinList.AddLast(managerLocal);
+						_managerDict.Add((uint)managerLocal.managerType, managerLocal);
+						if (managerLocal.needTick)
+							_tickLocalManagerLinList.AddLast(managerLocal);
+					}
+				}
+
+				eLocal = _toBeAddedLocalList.GetEnumerator();
+				while (eLocal.MoveNext())
+				{
+					managerLocal = eLocal.Current;
+					if (managerLocal != null)
+						managerLocal.Setup();
+				}
+
+				_toBeAddedLocalList.Clear();
+			}
 
 			var node = _localManagerLinList.First;
 			BaseLocalManager manager = null;
-			while(node != null)
+			while (node != null)
 			{
 				manager = node.Value;
 				if (manager != null)
@@ -123,6 +138,11 @@ namespace NingyoRi
 			}
 		}
 
+		private void OnSceneUnloaded(Scene scene)
+		{
+			OnGlobalManagerUnloaded(scene);
+			OnLocalManagerUnloaded(scene);
+		}
 		private void OnGlobalManagerUnloaded(Scene scene)
 		{
 			var node = _globalManagerLinList.Last;
@@ -167,7 +187,7 @@ namespace NingyoRi
 
 			_localManagerLinList.Clear();
 			_tickLocalManagerLinList.Clear();
-			_toBeAddedLocalManagers.Clear();
+			_toBeAddedLocalList.Clear();
 		}
 
 		#endregion
@@ -178,8 +198,9 @@ namespace NingyoRi
 				return;
 			if (_managerDict.ContainsKey((uint)manager.managerType))
 				return;
+			isDirtyAdd = true;
 			manager.Init();
-			_toBeAddedGlobalManagers.AddLast(manager);
+			_toBeAddedGlobalList.Add(manager);
 		}
 
 		public void AddLocalManager(BaseLocalManager manager)
@@ -188,64 +209,10 @@ namespace NingyoRi
 				return;
 			if (_managerDict.ContainsKey((uint)manager.managerType))
 				return;
+			isDirtyAdd = true;
 			manager.Init();
-			_toBeAddedLocalManagers.AddLast(manager);
+			_toBeAddedLocalList.Add(manager);
 		}
-
-		#region Add To LinkedList
-		private void AddToGlobal()
-		{
-			if (_toBeAddedGlobalManagers.Count == 0)
-				return;
-
-			var node = _toBeAddedGlobalManagers.First;
-			BaseGlobalManager manager = null;
-			while (node != null)
-			{
-				manager = node.Value;
-				if (manager != null)
-				{
-					_globalManagerLinList.AddLast(manager);
-					_managerDict.Add((uint)manager.managerType, manager);
-					if (manager.needTick)
-					{
-						_tickGlobalManagerLinList.AddLast(manager);
-					}
-					manager.Setup();
-				}
-				node = node.Next;
-			}
-
-			_toBeAddedGlobalManagers.Clear();
-		}
-
-		private void AddToLocal()
-		{
-			if (_toBeAddedLocalManagers.Count == 0)
-				return;
-
-			var node = _toBeAddedLocalManagers.First;
-			BaseLocalManager manager = null;
-			while (node != null)
-			{
-				manager = node.Value;
-				if (manager != null)
-				{
-					_localManagerLinList.AddLast(manager);
-					_managerDict.Add((uint)manager.managerType, manager);
-					if (manager.needTick)
-					{
-						_tickLocalManagerLinList.AddLast(manager);
-					}
-					manager.Setup();
-				}
-				node = node.Next;
-			}
-
-			_toBeAddedLocalManagers.Clear();
-		}
-
-		#endregion
 
 		public override void Destroy() // Destroy 模拟 OnSceneUnloaded
 		{
@@ -268,7 +235,7 @@ namespace NingyoRi
 
 			_globalManagerLinList.Clear();
 			_tickGlobalManagerLinList.Clear();
-			_toBeAddedGlobalManagers.Clear();
+			_toBeAddedGlobalList.Clear();
 
 			_managerDict.Clear();
 
@@ -296,7 +263,7 @@ namespace NingyoRi
 
 			nodeGlobal = _tickGlobalManagerLinList.First;
 			managerGlobal = null;
-			while(nodeGlobal != null)
+			while (nodeGlobal != null)
 			{
 				managerGlobal = nodeGlobal.Value;
 				if (managerGlobal != null && managerGlobal.needTick)
@@ -360,7 +327,7 @@ namespace NingyoRi
 
 			nodeLocal = _tickLocalManagerLinList.First;
 			managerLocal = null;
-			while(nodeLocal != null)
+			while (nodeLocal != null)
 			{
 				managerLocal = nodeLocal.Value;
 				if (managerLocal != null && managerLocal.needTick)
@@ -413,30 +380,90 @@ namespace NingyoRi
 		{
 			float deltaTime = Time.deltaTime;
 
-			var nodeGlobal = _globalManagerLinList.First;
-			BaseGlobalManager managerGlobal = null;
-			while (nodeGlobal != null)
+			if (isDirtyAdd == true)
 			{
-				managerGlobal = nodeGlobal.Value;
-				if (managerGlobal != null)
-				{
-					managerGlobal.TickAddTo(deltaTime);
-				}
-				nodeGlobal = nodeGlobal.Next;
-			}
+				isDirtyAdd = false;
 
-			var nodeLocal = _localManagerLinList.First;
-			BaseLocalManager managerLocal = null;
-			while (nodeLocal != null)
-			{
-				managerLocal = nodeLocal.Value;
-				if (managerLocal != null)
+				var nodeGlobal = _globalManagerLinList.First;
+				BaseGlobalManager managerGlobal = null;
+				while (nodeGlobal != null)
 				{
-					managerLocal.TickAddTo(deltaTime);
+					managerGlobal = nodeGlobal.Value;
+					if (managerGlobal != null && managerGlobal.isDirtyAdd)
+					{
+						managerGlobal.TickAddTo();
+					}
+					nodeGlobal = nodeGlobal.Next;
 				}
-				nodeLocal = nodeLocal.Next;
-			}
 
+				var nodeLocal = _localManagerLinList.First;
+				BaseLocalManager managerLocal = null;
+				while (nodeLocal != null)
+				{
+					managerLocal = nodeLocal.Value;
+					if (managerLocal != null && managerLocal.isDirtyAdd)
+					{
+						managerLocal.TickAddTo();
+					}
+					nodeLocal = nodeLocal.Next;
+				}
+
+				if (_toBeAddedGlobalList.Count != 0)
+				{
+					var e = _toBeAddedGlobalList.GetEnumerator();
+					while (e.MoveNext())
+					{
+						managerGlobal = e.Current;
+						if (managerGlobal != null)
+						{
+							managerGlobal.TickAddTo();
+
+							_globalManagerLinList.AddLast(managerGlobal);
+							_managerDict.Add((uint)managerGlobal.managerType, managerGlobal);
+							if (managerGlobal.needTick)
+								_tickGlobalManagerLinList.AddLast(managerGlobal);
+						}
+					}
+
+					e = _toBeAddedGlobalList.GetEnumerator();
+					while (e.MoveNext())
+					{
+						managerGlobal = e.Current;
+						if (managerGlobal != null)
+							managerGlobal.Setup();
+					}
+
+					_toBeAddedGlobalList.Clear();
+				}
+
+				if (_toBeAddedLocalList.Count != 0)
+				{
+					var eLocal = _toBeAddedLocalList.GetEnumerator();
+					while (eLocal.MoveNext())
+					{
+						managerLocal = eLocal.Current;
+						if (managerLocal != null)
+						{
+							managerLocal.TickAddTo();
+
+							_localManagerLinList.AddLast(managerLocal);
+							_managerDict.Add((uint)managerLocal.managerType, managerLocal);
+							if (managerLocal.needTick)
+								_tickLocalManagerLinList.AddLast(managerLocal);
+						}
+					}
+
+					eLocal = _toBeAddedLocalList.GetEnumerator();
+					while (eLocal.MoveNext())
+					{
+						managerLocal = eLocal.Current;
+						if (managerLocal != null)
+							managerLocal.Setup();
+					}
+
+					_toBeAddedLocalList.Clear();
+				}
+			}
 		}
 
 		public T GetManager<T>(ManagerType type) where T : class

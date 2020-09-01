@@ -6,19 +6,13 @@ namespace NingyoRi
 {
 	public class MainMenuPageContext : BasePageContext
 	{
+		protected override string _prefabPath { get { return @"UI/Contexts/PageContexts/MainMenuPage"; } }
+
 		private MonoMainMenuPage _mono;
 		protected override void Init()
 		{
-			_prefabPath = @"UI/Contexts/PageContexts/MainMenuPage";
-		}
-
-		public override void Setup()
-		{
-			base.Setup();
 			_mono = _monoContext as MonoMainMenuPage;
-			//needTick = false; // 需要在BaseContext里加一个needTick开关方法
 		}
-
 		protected override void SetupCallbacks()
 		{
 			base.SetupCallbacks();

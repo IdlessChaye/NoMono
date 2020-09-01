@@ -6,17 +6,15 @@ namespace NingyoRi
 {
 	public partial class ThirdPersonCameraEntity : BaseEntity
 	{
-
+		protected override string _prefabPath { get { return @"Entity/ThirdCamera"; } }
 		protected override void Init()
 		{
-			_prefabPath = @"Entity/ThirdCamera";
 			SetNeedTick(true);
-
+			AddComponent(new VCThirdPersonCamera());
 		}
 
 		public override void Setup()
 		{
-			AddComponent(new VCThirdPersonCamera());
 		}
 	}
 }

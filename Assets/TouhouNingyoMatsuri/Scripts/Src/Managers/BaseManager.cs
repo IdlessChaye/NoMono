@@ -5,9 +5,27 @@ namespace NingyoRi
 {
 	public abstract class BaseManager
 	{
+		public BaseManager()
+		{
+			isDirtyAdd = true;
+		}
+		public bool isDirtyAdd
+		{
+			get
+			{
+				return _isDirtyAdd;
+			}
+			set
+			{
+				_isDirtyAdd = value;
+				GameManager.isDirtyAdd = value;
+			}
+		}
 		public abstract ManagerType managerType { get; }
 
 		public bool needTick { get;	private set; }
+
+		private bool _isDirtyAdd;
 
 		public virtual void Init() { }
 
@@ -23,7 +41,13 @@ namespace NingyoRi
 
 		public virtual void Tick4(float deltaTime) { }
 
-		public virtual void TickAddTo(float deltaTime) { }
+		public virtual void TickAddTo()
+		{
+			if (isDirtyAdd == true)
+			{
+				isDirtyAdd = false;
+			}
+		}
 
 		public virtual void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode) { }
 

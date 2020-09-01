@@ -15,14 +15,14 @@ namespace NingyoRi
 
 		private LinkedList<BaseContext> _contextLinList = new LinkedList<BaseContext>();
 		private LinkedList<BaseContext> _tickContextLinList = new LinkedList<BaseContext>();
-		private LinkedList<BaseContext> _toBeAddedContexts = new LinkedList<BaseContext>();
+		private List<BaseContext> _toBeAddedContextList = new List<BaseContext>();
 
 		private void ShowPages(Scene scene)
 		{
 			var sceneName = scene.name;
 			if (sceneName.Equals("Menu"))
 			{
-				Miscs.GetUIManager().ShowPage(new MainMenuPageContext());
+				ShowPage(new MainMenuPageContext());
 			}
 		}
 		public override void Init()
@@ -45,16 +45,18 @@ namespace NingyoRi
 		{
 			if (context == null)
 				return;
+			isDirtyAdd = true;
 			context.Load(_pageContextRoot);
-			_toBeAddedContexts.AddLast(context);
+			_toBeAddedContextList.Add(context);
 		}
 
 		public void ShowWidget(BaseWidgetContext context)
 		{
 			if (context == null)
 				return;
+			isDirtyAdd = true;
 			context.Load(_widgetContextRoot);
-			_toBeAddedContexts.AddLast(context);
+			_toBeAddedContextList.Add(context);
 		}
 
 		public void ClosePage(BasePageContext context)
@@ -92,29 +94,37 @@ namespace NingyoRi
 			}
 		}
 
-		public override void TickAddTo(float deltaTime)
+		public override void TickAddTo()
 		{
-			if (_toBeAddedContexts.Count != 0)
+			if (isDirtyAdd == true)
 			{
-				var node = _toBeAddedContexts.First;
-				BaseContext context = null;
-				while (node != null)
+				isDirtyAdd = false;
+				if (_toBeAddedContextList.Count != 0)
 				{
-					context = node.Value;
-					if (context != null)
+					var e = _toBeAddedContextList.GetEnumerator();
+					BaseContext context = null;
+					while (e.MoveNext())
 					{
-						_contextLinList.AddLast(context);
-						//_contextDict.Add(context.);
-						if (context.needTick)
-						{ 
-							_tickContextLinList.AddLast(context);
+						context = e.Current;
+						if (context != null)
+						{
+							_contextLinList.AddLast(context);
+							//_contextDict.Add(context.);
+							if (context.needTick) 
+								_tickContextLinList.AddLast(context);
 						}
-						context.Setup();
 					}
-					node = node.Next;
-				}
 
-				_toBeAddedContexts.Clear();
+					e = _toBeAddedContextList.GetEnumerator();
+					while (e.MoveNext())
+					{
+						context = e.Current;
+						if (context != null)
+							context.Setup();
+					}
+
+					_toBeAddedContextList.Clear();
+				}
 			}
 		}
 

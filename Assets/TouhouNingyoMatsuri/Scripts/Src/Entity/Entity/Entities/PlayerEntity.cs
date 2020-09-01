@@ -6,9 +6,9 @@ namespace NingyoRi
 {
 	public partial class PlayerEntity : CharacterEntity
 	{
+		protected override string _prefabPath { get { return @"Entity/Player/Player"; } }
 		protected override void Init()
 		{
-			_prefabPath = @"Entity/Player/Player";
 			SetNeedTick(true);
 		}
 

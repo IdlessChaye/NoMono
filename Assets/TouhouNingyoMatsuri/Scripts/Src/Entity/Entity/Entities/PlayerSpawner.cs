@@ -6,6 +6,8 @@ namespace NingyoRi
 {
 	public partial class PlayerSpawner : BaseEntity
 	{ 
+		protected override string _prefabPath { get { return ""; } }
+
 		private static PlayerSpawn playerSpawnData;
 		private const string playerSpawnPath = @"Data/ConstData/PlayerSpawn";
 

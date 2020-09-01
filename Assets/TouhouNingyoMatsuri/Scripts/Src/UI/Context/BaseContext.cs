@@ -10,7 +10,7 @@ namespace NingyoRi
 	{
 		public bool needTick { get; private set; }
 
-		protected string _prefabPath { get; set; }
+		protected abstract string _prefabPath { get; }
 		protected GameObject _gameObject { get; private set; }
 		protected BaseMonoContext _monoContext { get; private set; }
 
@@ -19,8 +19,6 @@ namespace NingyoRi
 
 		public void Load(Transform pageContextRoot)
 		{
-			Init();
-
 			if (string.IsNullOrEmpty(_prefabPath))
 				throw new System.Exception("UIManager ShowPage No PrefabPath.");
 			GameObject prefab = Miscs.GetResourceManager().Get<GameObject>(_prefabPath);
@@ -32,10 +30,9 @@ namespace NingyoRi
 			if (_monoContext == null)
 				throw new System.Exception("UIManager ShowPage No BaseMonoPageContext.");
 			_monoContext.Init(this);
-		}
 
-		public virtual void Setup()
-		{
+			Init();
+
 			if (_unityEventList == null)
 				_unityEventList = new List<UnityEvent>(4);
 
@@ -44,6 +41,11 @@ namespace NingyoRi
 				SetupCallbacks();
 				SetupEvents();
 			});
+		}
+
+		public virtual void Setup()
+		{
+
 		}
 
 		protected abstract void Init(); // 设置 _prefabPath

@@ -13,7 +13,7 @@ namespace NingyoRi
 		private Dictionary<uint, BaseEntity> _id2entityDict = new Dictionary<uint, BaseEntity>(8);
 		private LinkedList<BaseEntity> _entityLinList = new LinkedList<BaseEntity>();
 		private LinkedList<BaseEntity> _tickEntityLinList = new LinkedList<BaseEntity>();
-		private LinkedList<BaseEntity> _toBeAddedEntities = new LinkedList<BaseEntity>();
+		private List<BaseEntity> _toBeAddedEntityList = new List<BaseEntity>();
 
 		private void AddEntities(Scene scene)
 		{
@@ -48,10 +48,9 @@ namespace NingyoRi
 		{
 			if (entity == null)
 				return;
-
+			isDirtyAdd = true;
 			entity.Create(entityId++, _entityRoot);
-
-			_toBeAddedEntities.AddLast(entity);
+			_toBeAddedEntityList.Add(entity);
 		}
 
 		public void RemoveEntity(BaseEntity entity)
@@ -144,47 +143,58 @@ namespace NingyoRi
 			}
 		}
 
-		public override void TickAddTo(float deltaTime)
+
+		#endregion
+
+		public override void TickAddTo()
 		{
-			LinkedListNode<BaseEntity> node = null;
-			BaseEntity entity = null;
-			if (_toBeAddedEntities.Count != 0)
+			if (isDirtyAdd == true)
 			{
-				node = _toBeAddedEntities.First;
-				entity = null;
-				while (node != null)
+				isDirtyAdd = false;
+
+				var node = _entityLinList.First;
+				BaseEntity value = null;
+				while(node != null)
 				{
-					entity = node.Value;
-					if (entity != null)
+					value = node.Value;
+					while(value != null && value.isDirtyAdd)
 					{
-						_entityLinList.AddLast(entity);
-						_id2entityDict.Add(entity.entityId, entity);
-						if (entity.needTick && entity.isActive)
-						{
-							_tickEntityLinList.AddLast(entity);
-						}
-						entity.Setup();
+						value.TickAddTo();
 					}
 					node = node.Next;
 				}
 
-				_toBeAddedEntities.Clear();
-			}
-
-			node = _entityLinList.First;
-			entity = null;
-			while (node != null)
-			{
-				entity = node.Value;
-				if (entity != null && entity.isActive)
+				if (_toBeAddedEntityList.Count != 0)
 				{
-					entity.TickAddTo(deltaTime);
+					var e = _toBeAddedEntityList.GetEnumerator();
+					BaseEntity entity = null;
+					while(e.MoveNext())
+					{
+						entity = e.Current;
+						if (entity != null)
+						{
+							entity.TickAddTo();
+
+							_entityLinList.AddLast(entity);
+							_id2entityDict.Add(entity.entityId, entity);
+							if (entity.needTick)
+								_tickEntityLinList.AddLast(entity);
+						}
+					}
+
+					e = _toBeAddedEntityList.GetEnumerator();
+					entity = null;
+					while(e.MoveNext())
+					{
+						entity = e.Current;
+						if (entity != null)
+							entity.Setup();
+					}
+
+					_toBeAddedEntityList.Clear();
 				}
-				node = node.Next;
 			}
 		}
-
-		#endregion
 
 		public override void OnLevelLoaded(Scene scene, LoadSceneMode loadSceneMode)
 		{
@@ -220,6 +230,7 @@ namespace NingyoRi
 			_tickEntityLinList.Clear();
 			_entityLinList.Clear();
 			_id2entityDict.Clear();
+			_toBeAddedEntityList.Clear();
 
 			SetNeedTick(false);
 		}
