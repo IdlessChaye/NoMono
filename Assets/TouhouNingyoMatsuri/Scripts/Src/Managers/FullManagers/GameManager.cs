@@ -18,10 +18,17 @@ namespace NingyoRi
 
 		private List<BaseGlobalManager> _toBeAddedGlobalList = new List<BaseGlobalManager>(); // 初始化是在Add的那个帧时候完成，但Tick是在下个帧
 		private List<BaseLocalManager> _toBeAddedLocalList = new List<BaseLocalManager>();  // _toBeAdded的目的是动态添加，双层分离初始化(Init\Setup)
+
 		private void AddFullManagers()
 		{
 			FullCoroutineManager.Instance.Init();
 			FullMusicManager.Instance.Init();
+		}
+
+		private void RemoveFullManagers()
+		{
+			FullMusicManager.Instance.Destroy();
+			FullCoroutineManager.Instance.Destroy();
 		}
 
 		private void AddGlobalManagers()
@@ -29,12 +36,6 @@ namespace NingyoRi
 			AddGlobalManager(new ResourceManager());
 			AddGlobalManager(new TextMapManager());
 			AddGlobalManager(new InputManager());
-		}
-
-		private void RemoveFullManagers()
-		{
-			FullMusicManager.Instance.Destroy();
-			FullCoroutineManager.Instance.Destroy();
 		}
 
 		private void AddLocalManagers(Scene scene)
@@ -51,6 +52,8 @@ namespace NingyoRi
 				AddLocalManager(new UIManager());
 			}
 		}
+
+
 
 		public override void Awake()
 		{

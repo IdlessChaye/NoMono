@@ -13,12 +13,15 @@ namespace NingyoRi
 
 		ThirdPersonCameraEntity camEntity;
 		PlayerEntity player;
+
 		protected override void Init()
 		{
 			playerSpawnData = Miscs.GetResourceManager().Get<PlayerSpawn>(playerSpawnPath);
 
 			player = new PlayerEntity();
 			Miscs.GetEntityManager().AddEntity(player);
+
+			Miscs.GetEntityManager().AddEntity(new AudioListenerEntity(player.GetGameObject().transform));
 
 			camEntity = new ThirdPersonCameraEntity();
 			Miscs.GetEntityManager().AddEntity(camEntity);
@@ -28,8 +31,6 @@ namespace NingyoRi
 		{
 			var vcCamera = camEntity.GetComponent<VCThirdPersonCamera>(ComponentType.VCThirdPersonCamera);
 			vcCamera.targetTF = player.GetGameObject().transform;
-
-			Miscs.GetEntityManager().AddEntity(new AudioListenerEntity(player.GetGameObject().transform));
 		}
 
 		

@@ -24,8 +24,7 @@ namespace NingyoRi
 			}
 			else if (sceneName.Equals("MainLevel"))
 			{
-				var playerSpawner = new PlayerSpawner();
-				AddEntity(playerSpawner);
+				AddEntity(new PlayerSpawner());
 			}
 		}
 
