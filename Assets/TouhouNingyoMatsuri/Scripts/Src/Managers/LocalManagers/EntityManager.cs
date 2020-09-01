@@ -166,11 +166,10 @@ namespace NingyoRi
 
 				if (_toBeAddedEntityList.Count != 0)
 				{
-					var e = _toBeAddedEntityList.GetEnumerator();
 					BaseEntity entity = null;
-					while(e.MoveNext())
+					for (int i = 0; i < _toBeAddedEntityList.Count; i++)
 					{
-						entity = e.Current;
+						entity = _toBeAddedEntityList[i];
 						if (entity != null)
 						{
 							entity.TickAddTo();
@@ -182,11 +181,9 @@ namespace NingyoRi
 						}
 					}
 
-					e = _toBeAddedEntityList.GetEnumerator();
-					entity = null;
-					while(e.MoveNext())
+					for (int i = 0; i < _toBeAddedEntityList.Count; i++)
 					{
-						entity = e.Current;
+						entity = _toBeAddedEntityList[i];
 						if (entity != null)
 							entity.Setup();
 					}

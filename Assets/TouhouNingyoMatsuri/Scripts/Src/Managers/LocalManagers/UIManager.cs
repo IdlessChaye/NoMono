@@ -101,11 +101,10 @@ namespace NingyoRi
 				isDirtyAdd = false;
 				if (_toBeAddedContextList.Count != 0)
 				{
-					var e = _toBeAddedContextList.GetEnumerator();
 					BaseContext context = null;
-					while (e.MoveNext())
+					for (int i = 0; i < _toBeAddedContextList.Count; i++)
 					{
-						context = e.Current;
+						context = _toBeAddedContextList[i];
 						if (context != null)
 						{
 							_contextLinList.AddLast(context);
@@ -115,10 +114,9 @@ namespace NingyoRi
 						}
 					}
 
-					e = _toBeAddedContextList.GetEnumerator();
-					while (e.MoveNext())
+					for (int i = 0; i < _toBeAddedContextList.Count; i++)
 					{
-						context = e.Current;
+						context = _toBeAddedContextList[i];
 						if (context != null)
 							context.Setup();
 					}

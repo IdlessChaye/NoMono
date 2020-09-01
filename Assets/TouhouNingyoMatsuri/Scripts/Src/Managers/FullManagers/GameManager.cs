@@ -410,10 +410,9 @@ namespace NingyoRi
 
 				if (_toBeAddedGlobalList.Count != 0)
 				{
-					var e = _toBeAddedGlobalList.GetEnumerator();
-					while (e.MoveNext())
+					for (int i = 0; i < _toBeAddedGlobalList.Count; i++)
 					{
-						managerGlobal = e.Current;
+						managerGlobal = _toBeAddedGlobalList[i];
 						if (managerGlobal != null)
 						{
 							managerGlobal.TickAddTo();
@@ -425,10 +424,9 @@ namespace NingyoRi
 						}
 					}
 
-					e = _toBeAddedGlobalList.GetEnumerator();
-					while (e.MoveNext())
+					for (int i = 0; i < _toBeAddedGlobalList.Count; i++)
 					{
-						managerGlobal = e.Current;
+						managerGlobal = _toBeAddedGlobalList[i];
 						if (managerGlobal != null)
 							managerGlobal.Setup();
 					}
@@ -438,10 +436,9 @@ namespace NingyoRi
 
 				if (_toBeAddedLocalList.Count != 0)
 				{
-					var eLocal = _toBeAddedLocalList.GetEnumerator();
-					while (eLocal.MoveNext())
+					for (int i = 0; i < _toBeAddedLocalList.Count; i++)
 					{
-						managerLocal = eLocal.Current;
+						managerLocal = _toBeAddedLocalList[i];
 						if (managerLocal != null)
 						{
 							managerLocal.TickAddTo();
@@ -453,10 +450,9 @@ namespace NingyoRi
 						}
 					}
 
-					eLocal = _toBeAddedLocalList.GetEnumerator();
-					while (eLocal.MoveNext())
+					for (int i = 0; i < _toBeAddedLocalList.Count; i++)
 					{
-						managerLocal = eLocal.Current;
+						managerLocal = _toBeAddedLocalList[i];
 						if (managerLocal != null)
 							managerLocal.Setup();
 					}

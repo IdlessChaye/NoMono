@@ -102,11 +102,10 @@ namespace NingyoRi
 				isDirtyAdd = false;
 				if (_toBeAddedCompList.Count != 0)
 				{
-					var e = _toBeAddedCompList.GetEnumerator();
 					BaseComponent comp = null;
-					while(e.MoveNext())
+					for (int i = 0;i < _toBeAddedCompList.Count; i++)
 					{
-						comp = e.Current;
+						comp = _toBeAddedCompList[i];
 						if (comp != null)
 						{
 							_compLinList.AddLast(comp);
@@ -116,11 +115,9 @@ namespace NingyoRi
 						}
 					}
 
-					e = _toBeAddedCompList.GetEnumerator();
-					comp = null;
-					while(e.MoveNext())
+					for (int i = 0; i < _toBeAddedCompList.Count; i++)
 					{
-						comp = e.Current;
+						comp = _toBeAddedCompList[i];
 						if (comp !=null)
 						{
 							comp.Setup();
