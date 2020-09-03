@@ -13,6 +13,12 @@ namespace NingyoRi
 
 	public partial class InputManager : BaseGlobalManager
 	{
+		public static InputManager instance;
+
+		public InputManager() : base()
+		{
+			instance = this;
+		}
 
 		public override void Init()
 		{

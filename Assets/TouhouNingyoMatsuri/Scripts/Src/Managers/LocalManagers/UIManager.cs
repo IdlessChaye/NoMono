@@ -7,6 +7,12 @@ namespace NingyoRi
 {
 	public partial class UIManager : BaseLocalManager
 	{
+		public static UIManager instance;
+		public UIManager() : base()
+		{
+			instance = this;
+		}
+
 		private Transform _uiCanvasRoot;
 		private Transform _pageContextRoot;
 		private Transform _widgetContextRoot;
@@ -27,7 +33,7 @@ namespace NingyoRi
 		}
 		public override void Init()
 		{
-			var _uiCanvasPrefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.uiCanvasPath);
+			var _uiCanvasPrefab = ResourceManager.instance.Get<GameObject>(GlobalVars.uiCanvasPath);
 			if (_uiCanvasPrefab == null)
 				throw new System.Exception("UIManager Init");
 

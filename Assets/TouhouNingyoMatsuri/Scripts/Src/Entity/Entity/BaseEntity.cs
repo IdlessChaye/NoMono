@@ -20,7 +20,7 @@ namespace NingyoRi
 			set
 			{
 				_isDirtyAdd = value;
-				Miscs.GetEntityManager().isDirtyAdd = value;
+				EntityManager.instance.isDirtyAdd = value;
 			}
 		}
 		public abstract EntityType entityType { get; }
@@ -46,7 +46,7 @@ namespace NingyoRi
 
 			if (string.IsNullOrEmpty(_prefabPath) == false)
 			{
-				GameObject prefab = Miscs.GetResourceManager().Get<GameObject>(_prefabPath);
+				GameObject prefab = ResourceManager.instance.Get<GameObject>(_prefabPath);
 				if (prefab == null)
 					throw new System.Exception("BaseEntity Create.");
 				_gameObject = GameObject.Instantiate(prefab);

@@ -14,6 +14,12 @@ namespace NingyoRi
 
 	public partial class TextMapManager : BaseGlobalManager
 	{
+		public static TextMapManager instance;
+		public TextMapManager() : base()
+		{
+			instance = this;
+		}
+
 
 		private const string PATH = @"TextMap/TextMap";
 

@@ -21,7 +21,7 @@ namespace NingyoRi
 		{
 			if (string.IsNullOrEmpty(_prefabPath))
 				throw new System.Exception("UIManager ShowPage No PrefabPath.");
-			GameObject prefab = Miscs.GetResourceManager().Get<GameObject>(_prefabPath);
+			GameObject prefab = ResourceManager.instance.Get<GameObject>(_prefabPath);
 			if (prefab == null)
 				throw new System.Exception("UIManager ShowPage.");
 			_gameObject = GameObject.Instantiate(prefab);

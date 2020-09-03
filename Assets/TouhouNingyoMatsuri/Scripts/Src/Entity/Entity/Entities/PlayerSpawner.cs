@@ -16,15 +16,15 @@ namespace NingyoRi
 
 		protected override void Init()
 		{
-			playerSpawnData = Miscs.GetResourceManager().Get<PlayerSpawn>(playerSpawnPath);
+			playerSpawnData = ResourceManager.instance.Get<PlayerSpawn>(playerSpawnPath);
 
 			player = new PlayerEntity();
-			Miscs.GetEntityManager().AddEntity(player);
+			EntityManager.instance.AddEntity(player);
 
-			Miscs.GetEntityManager().AddEntity(new AudioListenerEntity(player.GetGameObject().transform));
+			EntityManager.instance.AddEntity(new AudioListenerEntity(player.GetGameObject().transform));
 
 			camEntity = new ThirdPersonCameraEntity();
-			Miscs.GetEntityManager().AddEntity(camEntity);
+			EntityManager.instance.AddEntity(camEntity);
 			
 		}
 		public override void Setup()

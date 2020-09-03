@@ -7,6 +7,12 @@ namespace NingyoRi
 
 	public partial class ResourceManager : BaseGlobalManager
 	{
+		public static ResourceManager instance;
+
+		public ResourceManager() : base()
+		{
+			instance = this;
+		}
 
 		private Dictionary<string, Object> _prefabDict = new Dictionary<string, Object>();
 

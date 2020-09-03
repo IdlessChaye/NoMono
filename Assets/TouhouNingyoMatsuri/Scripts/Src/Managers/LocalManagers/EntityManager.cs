@@ -7,6 +7,12 @@ namespace NingyoRi
 {
 	public partial class EntityManager : BaseLocalManager
 	{
+		public static EntityManager instance;
+		public EntityManager() : base()
+		{
+			instance = this;
+		}
+
 		private Transform _entityRoot;
 		private static uint entityId = 0;
 
@@ -31,7 +37,7 @@ namespace NingyoRi
 
 		public override void Init()
 		{
-			var prefab = Miscs.GetResourceManager().Get<GameObject>(GlobalVars.entityPath);
+			var prefab = ResourceManager.instance.Get<GameObject>(GlobalVars.entityPath);
 			if (prefab == null)
 				throw new System.Exception("EntityManager Init");
 

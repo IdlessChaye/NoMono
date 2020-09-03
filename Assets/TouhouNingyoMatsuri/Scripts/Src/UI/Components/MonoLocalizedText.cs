@@ -12,7 +12,7 @@ namespace NingyoRi
 		// Use this for initialization
 		void Start()
 		{
-			text.text = Miscs.TextMapGet(key);
+			text.text = TextMapManager.instance.Get(key);
 		}
 
 	}
