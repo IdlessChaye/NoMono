@@ -118,9 +118,3 @@
 - 看情况继承BaseLogicComponent或者BaseVisualComponent
 - 通过BaseEntity的AddComponent来挂载到Entity上
 - Init()和Setup()的规则与Entity类似
-
-### TODO
-
-现在猖狂，等游戏写起来了就发现还是需要重构的嘤
-
-### 嘤

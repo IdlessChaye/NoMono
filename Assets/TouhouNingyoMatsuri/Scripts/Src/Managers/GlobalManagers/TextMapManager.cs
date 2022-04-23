@@ -30,12 +30,12 @@ namespace NingyoRi
 
 		public override void Init()
 		{
-			LoadTextMapData();
+			LoadTextMapData(PATH);
 		}
 
-		private void LoadTextMapData()
+		private void LoadTextMapData(string path)
 		{
-			string[] textmapItems = GetTextMapItems(PATH);
+			string[] textmapItems = GetTextMapItems(path);
 			if (textmapItems == null)
 				throw new System.Exception("TextMap Load failed.");
 			int length = textmapItems.Length;

@@ -80,6 +80,12 @@ namespace NingyoRi
 			anim = go.GetComponent<Animator>();
 			col = go.GetComponent<CapsuleCollider>();
 			rb = go.GetComponent<Rigidbody>();
+			if (_transform != null)
+			{ 
+				go.transform.position = _transform.position;
+				go.transform.rotation = _transform.rotation;
+				go.transform.localScale = _transform.localScale;
+			}
 			_transform = go.transform;
 
 			// CapsuleColliderコンポーネントのHeight、Centerの初期値を保存する

@@ -223,17 +223,17 @@ namespace NingyoRi
 
 			OnSceneUnloaded(scene);
 
-			var nodee = _globalManagerLinList.Last;
-			BaseGlobalManager managerr = null;
-			while (nodee != null)
+			var node = _globalManagerLinList.Last;
+			BaseGlobalManager manager = null;
+			while (node != null)
 			{
-				managerr = nodee.Value;
-				if (managerr != null)
+				manager = node.Value;
+				if (manager != null)
 				{
-					managerr.Destroy();
-					_managerDict.Remove((uint)managerr.managerType);
+					manager.Destroy();
+					_managerDict.Remove((uint)manager.managerType);
 				}
-				nodee = nodee.Previous;
+				node = node.Previous;
 			}
 
 			_globalManagerLinList.Clear();

@@ -41,8 +41,8 @@ namespace NingyoRi
 			if (prefab == null)
 				throw new System.Exception("EntityManager Init");
 
-			var _uiCanvasGO = GameObject.Find("EntityRoot");
-			_entityRoot = _uiCanvasGO != null ? _uiCanvasGO.transform : null;
+			var _entityRootGO = GameObject.Find("EntityRoot");
+			_entityRoot = _entityRootGO != null ? _entityRootGO.transform : null;
 			if (_entityRoot == null)
 				_entityRoot = GameObject.Instantiate(prefab).transform;
 
